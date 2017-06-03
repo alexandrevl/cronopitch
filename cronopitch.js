@@ -7,28 +7,10 @@
    var minutesLeft = 0;
    $(function() {
        $("#setTime").click(function() {
-           if (timer != null) {
-               clearInterval(timer);
-           }
-           minutesLeft = $("#time").find(":selected").val();
-           countDownDate = new Date().getTime() + (60000 * minutesLeft + 1000);
-           //countDownDate = new Date().getTime() + (15000);
-           setTimeCookie(countDownDate);
-           setTimer(countDownDate);
+           prepareTimer();
        });
        $("#resetTime").click(function() {
-           if (timer != null) {
-               clearInterval(timer);
-           }
-           countDownDate = new Date().getTime();
-           setTimeCookie(countDownDate);
-           $("body").css("background-color", "#FFFFFF");
-           $("#setTime").show();
-           $("#time").show();
-           $("#advanced").show();
-           $("#resetTime").hide();
-           $("#displayTimer").css("font-size", fontSizeInfo);
-           $("#displayTimer").text("Set your timer");
+           resetTimer();
        });
        var countDownDateCookie = readCookie('time');
        if (countDownDateCookie != null) {
@@ -37,7 +19,52 @@
                setTimer(countDownDateCookie);
            }
        }
+       $(window).keydown(function(e) {
+           switch (e.keyCode) {
+               case 32:
+                   if (timer != null) {
+                       resetTimer();
+                   } else {
+                       prepareTimer();
+                   }
+                   return;
+               case 82:
+                   if (timer != null) {
+                       resetTimer();
+                   } else {
+                       prepareTimer();
+                   }
+                   return;
+           }
+       });
    });
+
+   function prepareTimer() {
+       if (timer != null) {
+           clearInterval(timer);
+       }
+       minutesLeft = $("#time").find(":selected").val();
+       countDownDate = new Date().getTime() + (60000 * minutesLeft + 1000);
+       //countDownDate = new Date().getTime() + (15000);
+       setTimeCookie(countDownDate);
+       setTimer(countDownDate);
+   }
+
+   function resetTimer() {
+       if (timer != null) {
+           clearInterval(timer);
+       }
+       timer = null;
+       countDownDate = new Date().getTime();
+       setTimeCookie(countDownDate);
+       $("body").css("background-color", "#FFFFFF");
+       $("#setTime").show();
+       $("#time").show();
+       $("#advanced").show();
+       $("#resetTime").hide();
+       $("#displayTimer").css("font-size", fontSizeInfo);
+       $("#displayTimer").text("Set your timer");
+   }
 
    function setTimer(countDownDate) {
        $("#advanced").hide();
