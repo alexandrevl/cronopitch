@@ -22,34 +22,84 @@
 
     <script>
         // Set the date we're counting down to
-        var countDownDate = new Date("Jun 1, 2017 17:37:25").getTime();
-
-        // Update the count down every 1 second
-        var x = setInterval(function() {
-
-            // Get todays date and time
-            var now = new Date().getTime();
-
-            // Find the distance between now an the count down date
-            var distance = countDownDate - now;
-
-            // Time calculations for days, hours, minutes and seconds
-            var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-            // Display the result in the element with id="demo"
-            // document.getElementById("demo").innerHTML = days + "d " + hours + "h " +
-            //     minutes + "m " + seconds + "s ";
-            document.getElementById("demo").innerHTML = hours + "h " + minutes + "m " + seconds + "s ";
-
-            // If the count down is finished, write some text 
-            if (distance < 0) {
-                clearInterval(x);
-                document.getElementById("demo").innerHTML = "EXPIRED";
+        //var countDownDate = new Date("Jun 3, 2017 15:37:25").getTime();
+        var timer = null;
+        var countDownDate = null;
+        $(function() {
+            $("#setTime").click(function() {
+                if (timer != null) {
+                    clearInterval(timer);
+                }
+                console.log($("#time").find(":selected").val());
+                var minutesLeft = $("#time").find(":selected").val();
+                countDownDate = new Date().getTime() + (60000 * minutesLeft);
+                setTimeCookie(countDownDate);
+                setTimer(countDownDate);
+            });
+            $("#resetTime").click(function() {
+                if (timer != null) {
+                    clearInterval(timer);
+                }
+                countDownDate = new Date().getTime();
+                setTimeCookie(countDownDate);
+                $("#setTime").show();
+                $("#time").show();
+                $("#resetTime").hide();
+                $("#demo").css("font-size", "100");
+                $("#demo").text("Set your timer");
+            });
+            var countDownDateCookie = readCookie('cronopitch');
+            if (countDownDateCookie != null) {
+                var now = new Date();
+                console.log(countDownDateCookie + " - " + now.getTime());
+                if (countDownDateCookie > now.getTime()) {
+                    setTimer(countDownDateCookie);
+                }
             }
-        }, 1000);
+        });
+
+        function setTimer(countDownDate) {
+            $("#demo").text("");
+            $("#demo").css("font-size", "250");
+            $("#labelTime").hide();
+            $("#time").hide();
+            $("#resetTime").show();
+            // Update the count down every 1 second
+            timer = setInterval(function() {
+
+                // Get todays date and time
+                var now = new Date().getTime();
+
+                // Find the distance between now an the count down date
+                var distance = countDownDate - now;
+
+                // Time calculations for days, hours, minutes and seconds
+                var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                if (seconds < 10) {
+                    seconds = "0" + seconds;
+                }
+
+                // Display the result in the element with id="demo"
+                // document.getElementById("demo").innerHTML = days + "d " + hours + "h " +
+                //     minutes + "m " + seconds + "s ";
+                if (hours > 0) {
+                    $("#demo").text(hours + ":" + minutes + ":" + seconds);
+                } else if (minutes > 0) {
+                    $("#demo").text(minutes + ":" + seconds);
+                } else {
+                    $("#demo").text(seconds);
+                }
+
+                // If the count down is finished, write some text 
+                if (distance < 0) {
+                    clearInterval(timer);
+                    document.getElementById("demo").innerHTML = "EXPIRED";
+                }
+            }, 500);
+        }
     </script>
     <script>
         (function(i, s, o, g, r, a, m) {
@@ -76,7 +126,6 @@
                 expires = "; expires=" + date.toUTCString();
             }
             document.cookie = name + "=" + value + expires + "; path=/";
-            console.log(name + "=" + value + expires + "; path=/");
         }
 
         function readCookie(name) {
@@ -95,39 +144,25 @@
             createCookie(name, "", -1);
         }
 
-        function setTime() {
-            createCookie('cronopitch', 'testcookie', 7);
-
-            var x = readCookie('cronopitch');
-            console.log(x);
-            if (x) {
-                document.getElementById("demo2").innerHTML = "Teste - " + x;
-            }
-
+        function setTimeCookie(minutes) {
+            createCookie('cronopitch', minutes, 7);
         }
-        var x1 = setTime();
     </script>
 </head>
 
 <body>
-    <p id="demo"></p>
+    <p id="demo" style="font-size:100" align="center">Set your timer</p>
     <p id="demo2"></p>
 
-
-    <form>
-        <div class="form-group">
-            <label for="tempo">Tempo</label>
-            <input type="tempo" class="form-control" id="tempo">
-        </div>
-        <!--<div class="form-group">
-            <label for="pwd">Password:</label>
-            <input type="password" class="form-control" id="pwd">
-        </div>
-        <div class="checkbox">
-            <label><input type="checkbox"> Remember me</label>
-        </div>-->
-        <button type="submit" class="btn btn-default">Submit</button>
-    </form>
+    <div class="form-group" align="center">
+        <select id="time">
+            <option value="10">10 minutes</option>
+            <option value="15">15 minutes</option>
+            <option value="20">20 minutes</option>
+            <option value="30">30 minutes</option>
+        </select>
+        <button id="setTime">Set</button> <button id="resetTime" hidden>Reset</button>
+    </div>
 </body>
 
 </html>
