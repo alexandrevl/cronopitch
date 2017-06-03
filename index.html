@@ -2,9 +2,11 @@
 
 <head>
     <title>
-        Cronopitch
+        Cronopitch - A timer for your pitch
     </title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name=viewport content="width=device-width, initial-scale=1">
+    <meta name=description content="A timer for your pitch">
 
     <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
 
@@ -25,13 +27,14 @@
         //var countDownDate = new Date("Jun 3, 2017 15:37:25").getTime();
         var timer = null;
         var countDownDate = null;
+        var fontSize = 450;
+        var minutesLeft = 0;
         $(function() {
             $("#setTime").click(function() {
                 if (timer != null) {
                     clearInterval(timer);
                 }
-                console.log($("#time").find(":selected").val());
-                var minutesLeft = $("#time").find(":selected").val();
+                minutesLeft = $("#time").find(":selected").val();
                 countDownDate = new Date().getTime() + (60000 * minutesLeft);
                 setTimeCookie(countDownDate);
                 setTimer(countDownDate);
@@ -51,7 +54,6 @@
             var countDownDateCookie = readCookie('cronopitch');
             if (countDownDateCookie != null) {
                 var now = new Date();
-                console.log(countDownDateCookie + " - " + now.getTime());
                 if (countDownDateCookie > now.getTime()) {
                     setTimer(countDownDateCookie);
                 }
@@ -59,9 +61,9 @@
         });
 
         function setTimer(countDownDate) {
-            $("#demo").text("");
-            $("#demo").css("font-size", "250");
-            $("#labelTime").hide();
+            $("#demo").text(minutesLeft + ":00");
+            $("#demo").css("font-size", fontSize);
+            $("#setTime").hide();
             $("#time").hide();
             $("#resetTime").show();
             // Update the count down every 1 second
@@ -87,18 +89,17 @@
                 //     minutes + "m " + seconds + "s ";
                 if (hours > 0) {
                     $("#demo").text(hours + ":" + minutes + ":" + seconds);
-                } else if (minutes > 0) {
-                    $("#demo").text(minutes + ":" + seconds);
                 } else {
-                    $("#demo").text(seconds);
+                    $("#demo").text(minutes + ":" + seconds);
                 }
 
                 // If the count down is finished, write some text 
                 if (distance < 0) {
                     clearInterval(timer);
-                    document.getElementById("demo").innerHTML = "EXPIRED";
+                    $("#demo").css("font-size", "200");
+                    document.getElementById("demo").innerHTML = "FINISHED";
                 }
-            }, 500);
+            }, 100);
         }
     </script>
     <script>
@@ -131,7 +132,6 @@
         function readCookie(name) {
             var nameEQ = name + "=";
             var ca = document.cookie.split(';');
-            console.log(ca);
             for (var i = 0; i < ca.length; i++) {
                 var c = ca[i];
                 while (c.charAt(0) == ' ') c = c.substring(1, c.length);
@@ -156,7 +156,10 @@
 
     <div class="form-group" align="center">
         <select id="time">
-            <option value="10">10 minutes</option>
+            <option value="1">1 minute</option>
+            <option value="3">3 minutes</option>
+            <option value="5">5 minutes</option>
+            <option value="10" selected>10 minutes</option>
             <option value="15">15 minutes</option>
             <option value="20">20 minutes</option>
             <option value="30">30 minutes</option>
