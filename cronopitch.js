@@ -27,8 +27,8 @@
            $("#time").show();
            $("#advanced").show();
            $("#resetTime").hide();
-           $("#demo").css("font-size", fontSizeInfo);
-           $("#demo").text("Set your timer");
+           $("#displayTimer").css("font-size", fontSizeInfo);
+           $("#displayTimer").text("Set your timer");
        });
        var countDownDateCookie = readCookie('time');
        if (countDownDateCookie != null) {
@@ -43,8 +43,8 @@
        $("#advanced").hide();
        $("#setTime").hide();
        $("#time").hide();
-       $("#demo").text(minutesLeft + ":00");
-       $("#demo").css("font-size", fontSizeTimer);
+       $("#displayTimer").text(minutesLeft + ":00");
+       $("#displayTimer").css("font-size", fontSizeTimer);
        $("#resetTime").show();
        // Update the count down every 1 second
        timer = setInterval(function() {
@@ -64,16 +64,14 @@
                seconds = "0" + seconds;
            }
 
-           // Display the result in the element with id="demo"
-           // document.getElementById("demo").innerHTML = days + "d " + hours + "h " +
-           //     minutes + "m " + seconds + "s ";
+           // Display the result in the element with id="displayTimer"
            if (hours > 0) {
-               $("#demo").text(hours + ":" + minutes + ":" + seconds);
+               $("#displayTimer").text(hours + ":" + minutes + ":" + seconds);
            } else {
-               $("#demo").text(minutes + ":" + seconds);
+               $("#displayTimer").text(minutes + ":" + seconds);
                if (minutes == 0 && seconds <= 10) {
                    $("body").css("background-color", "#FF0000");
-                   $("#demo").css("color", "#FFFFFF");
+                   $("#displayTimer").css("color", "#FFFFFF");
                }
            }
 
@@ -81,9 +79,9 @@
            // If the count down is finished, write some text 
            if (distance < 0) {
                clearInterval(timer);
-               $("#demo").css({ 'color': '#000000', 'font-size': fontSizeInfo });
+               $("#displayTimer").css({ 'color': '#000000', 'font-size': fontSizeInfo });
                $("body").css("background-color", "#FFFFFF");
-               document.getElementById("demo").innerHTML = "FINISHED";
+               document.getElementById("displayTimer").innerHTML = "FINISHED";
            }
        }, 100);
    }
