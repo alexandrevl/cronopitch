@@ -2,7 +2,8 @@
    //var countDownDate = new Date("Jun 3, 2017 15:37:25").getTime();
    var timer = null;
    var countDownDate = null;
-   var fontSize = 450;
+   var fontSizeTimer = "30vw";
+   var fontSizeInfo = "10vw";
    var minutesLeft = 0;
    $(function() {
        $("#setTime").click(function() {
@@ -10,7 +11,8 @@
                clearInterval(timer);
            }
            minutesLeft = $("#time").find(":selected").val();
-           countDownDate = new Date().getTime() + (60000 * minutesLeft);
+           countDownDate = new Date().getTime() + (60000 * minutesLeft + 1000);
+           //countDownDate = new Date().getTime() + (15000);
            setTimeCookie(countDownDate);
            setTimer(countDownDate);
        });
@@ -20,13 +22,15 @@
            }
            countDownDate = new Date().getTime();
            setTimeCookie(countDownDate);
+           $("body").css("background-color", "#FFFFFF");
            $("#setTime").show();
            $("#time").show();
+           $("#advanced").show();
            $("#resetTime").hide();
-           $("#demo").css("font-size", "100");
+           $("#demo").css("font-size", fontSizeInfo);
            $("#demo").text("Set your timer");
        });
-       var countDownDateCookie = readCookie('cronopitch');
+       var countDownDateCookie = readCookie('time');
        if (countDownDateCookie != null) {
            var now = new Date();
            if (countDownDateCookie > now.getTime()) {
@@ -36,10 +40,11 @@
    });
 
    function setTimer(countDownDate) {
-       $("#demo").text(minutesLeft + ":00");
-       $("#demo").css("font-size", fontSize);
+       $("#advanced").hide();
        $("#setTime").hide();
        $("#time").hide();
+       $("#demo").text(minutesLeft + ":00");
+       $("#demo").css("font-size", fontSizeTimer);
        $("#resetTime").show();
        // Update the count down every 1 second
        timer = setInterval(function() {
@@ -66,12 +71,18 @@
                $("#demo").text(hours + ":" + minutes + ":" + seconds);
            } else {
                $("#demo").text(minutes + ":" + seconds);
+               if (minutes == 0 && seconds <= 10) {
+                   $("body").css("background-color", "#FF0000");
+                   $("#demo").css("color", "#FFFFFF");
+               }
            }
+
 
            // If the count down is finished, write some text 
            if (distance < 0) {
                clearInterval(timer);
-               $("#demo").css("font-size", "200");
+               $("#demo").css({ 'color': '#000000', 'font-size': fontSizeInfo });
+               $("body").css("background-color", "#FFFFFF");
                document.getElementById("demo").innerHTML = "FINISHED";
            }
        }, 100);
@@ -103,5 +114,5 @@
    }
 
    function setTimeCookie(minutes) {
-       createCookie('cronopitch', minutes, 7);
+       createCookie('time', minutes, 7);
    }
