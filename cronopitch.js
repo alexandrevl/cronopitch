@@ -21,11 +21,18 @@
        }
        $(window).keydown(function(e) {
            switch (e.keyCode) {
+               case 27:
+                   resetTimer();
+                   return;
                case 32:
-                   if (timer != null) {
-                       resetTimer();
-                   } else {
+                   if (countDownDate == null) {
                        prepareTimer();
+                   } else {
+                       if (timer == null) {
+                           resumeTimer();
+                       } else {
+                           pauseTimer();
+                       }
                    }
                    return;
                case 82:
@@ -37,7 +44,30 @@
                    return;
            }
        });
+       $("#resetTime").hide();
    });
+   var blinkTimer = null;
+
+   function pauseTimer() {
+       if (timer != null) {
+           clearInterval(timer);
+           timer = null;
+           blinkTimer = setInterval(function() {
+               $("#displayTimer").fadeOut(500, function() {
+                   $(this).fadeIn(500);
+               });
+           }, 500)
+       }
+   }
+   var isResumed = false;
+
+   function resumeTimer() {
+       clearInterval(blinkTimer);
+       var countDownDate = new Date().getTime() + distance;
+       isResumed = true;
+       setTimeCookie(countDownDate);
+       setTimer(countDownDate);
+   }
 
    function prepareTimer() {
        if (timer != null) {
@@ -54,6 +84,7 @@
        if (timer != null) {
            clearInterval(timer);
        }
+       clearInterval(blinkTimer);
        timer = null;
        countDownDate = new Date().getTime();
        setTimeCookie(countDownDate);
@@ -64,13 +95,19 @@
        $("#resetTime").hide();
        $("#displayTimer").css("font-size", fontSizeInfo);
        $("#displayTimer").text("Set your timer");
+       countDownDate = null;
    }
+   var distance = 0;
 
    function setTimer(countDownDate) {
        $("#advanced").hide();
        $("#setTime").hide();
        $("#time").hide();
-       $("#displayTimer").text(minutesLeft + ":00");
+       if (!isResumed) {
+           $("#displayTimer").text(minutesLeft + ":00");
+       } else {
+           isResumed = false;
+       }
        $("#displayTimer").css("font-size", fontSizeTimer);
        $("#resetTime").show();
        // Update the count down every 1 second
@@ -80,7 +117,7 @@
            var now = new Date().getTime();
 
            // Find the distance between now an the count down date
-           var distance = countDownDate - now;
+           distance = countDownDate - now;
 
            // Time calculations for days, hours, minutes and seconds
            var days = Math.floor(distance / (1000 * 60 * 60 * 24));
