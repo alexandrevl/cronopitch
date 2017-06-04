@@ -24,9 +24,7 @@
        $(window).keydown(function(e) {
            switch (e.keyCode) {
                case 27:
-                   if (timer != null) {
-                       resetTimer();
-                   }
+                   resetTimer();
                    return;
                case 32:
                    if (countDownDate == null) {
@@ -42,6 +40,7 @@
            }
        });
    });
+
    var blinkTimer = null;
 
    function pauseTimer() {
@@ -73,28 +72,27 @@
            clearInterval(timer);
        }
        minutesLeft = $("#time").find(":selected").val();
-       countDownDate = new Date().getTime() + (60000 * minutesLeft + 1000);
+       countDownDate = new Date().getTime() + (60000 * minutesLeft + 800);
        //countDownDate = new Date().getTime() + (15000);
        setTimeCookie(countDownDate);
        setTimer(countDownDate);
    }
 
    function resetTimer() {
-       if (timer != null) {
-           clearInterval(timer);
-           clearInterval(blinkTimer);
-           timer = null;
-           eraseCookie('time');
-           eraseCookie('timerPaused');
-           $("body").css("background-color", "#FFFFFF");
-           $("#setTime").show();
-           $("#time").show();
-           $("#advanced").show();
-           $("#resetTime").hide();
-           $("#displayTimer").css("font-size", fontSizeInfo);
-           $("#displayTimer").text("Set your timer");
-           countDownDate = null;
-       }
+       clearInterval(timer);
+       clearInterval(blinkTimer);
+       timer = null;
+       eraseCookie('time');
+       eraseCookie('timerPaused');
+       $("body").css("background-color", "#FFFFFF");
+       $("#setTime").show();
+       $("#time").show();
+       $("#advanced").show();
+       $("#resetTime").hide();
+       $("#displayTimer").css("font-size", fontSizeInfo);
+       $("#displayTimer").text("Set your timer");
+       $("#displayTimer").fadeIn(1);
+       countDownDate = null;
    }
    var distance = 0;
 
