@@ -14,6 +14,9 @@
        $("#resetTime").click(function() {
            resetTimer();
        });
+       $("#bg_mask").click(function() {
+           resetTimer();
+       });
        $("#displayTimer").click(function() {
            if (countDownDate != null) {
                if (timer == null) {
@@ -92,7 +95,7 @@
        isPaused = false;
        minutesLeft = $("#time").find(":selected").val();
        countDownDate = new Date().getTime() + (60000 * minutesLeft + 1000);
-       //countDownDate = new Date().getTime() + (15000);
+       //countDownDate = new Date().getTime() + (3000);
        setTimeCookie(countDownDate);
        setTimer(countDownDate);
    }
@@ -111,7 +114,9 @@
        $("#displayTimer").css("font-size", fontSizeInfo);
        $("#displayTimer").text("Set your timer");
        $("#displayTimer").fadeIn(1);
+       $("#displayTimer").css({ 'color': '#000000' });
        countDownDate = null;
+       hideFrontLayer();
    }
    var distance = 0;
 
@@ -161,9 +166,13 @@
            // If the count down is finished, write some text 
            if (distance < 0) {
                clearInterval(timer);
-               $("#displayTimer").css({ 'color': '#000000', 'font-size': fontSizeInfo });
-               $("body").css("background-color", "#FFFFFF");
-               document.getElementById("displayTimer").innerHTML = "FINISHED";
+               //$("#displayTimer").css({ 'color': '#000000', 'font-size': fontSizeInfo });
+               //$("#displayTimer").css({ 'color': '#000000' });
+               //$("body").css("background-color", "#FFFFFF");
+               document.getElementById("displayTimer").innerHTML = "0:00";
+               this.countDownDate = null;
+               this.timer = null;
+               showFrontLayer();
            }
            if (isPaused) {
                pauseTimer();
@@ -199,4 +208,14 @@
 
    function setTimeCookie(countDownDate) {
        createCookie('time', countDownDate, 7);
+   }
+
+   function showFrontLayer() {
+       document.getElementById('bg_mask').style.visibility = 'visible';
+       document.getElementById('frontlayer').style.visibility = 'visible';
+   }
+
+   function hideFrontLayer() {
+       document.getElementById('bg_mask').style.visibility = 'hidden';
+       document.getElementById('frontlayer').style.visibility = 'hidden';
    }

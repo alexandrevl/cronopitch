@@ -30,13 +30,50 @@
         ga('create', 'UA-100391160-1', 'auto');
         ga('send', 'pageview');
     </script>
+    <style>
+        #bg_mask {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            margin: auto;
+            margin-top: 0px;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            visibility: hidden;
+        }
+        
+        #frontlayer {
+            position: relative;
+            top: 20%;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            margin: auto;
+            padding: 30px;
+            width: 50%;
+            height: 40%;
+            font-size: 10vw;
+            color: white;
+            background-color: transparent;
+            visibility: hidden;
+            border: 3px solid white;
+            z-index: 2;
+        }
+    </style>
 </head>
 
 <body>
+    <div id="bg_mask">
+        <div id="frontlayer" align='center'>Applause</div>
+    </div>
     <div class="container-fluid">
         <p id="displayTimer" style="font-size:10vw" align="center">Set your timer</p>
         <div align="center">
-            <button id="resetTime" display="none" class="btn btn-default">Reset (esc)</button>
+            <button id="resetTime" display="none" class="btn btn-default" style="z-index:-1">Reset (esc)</button>
         </div>
         <div class="container-fluid">
             <div class="row">
