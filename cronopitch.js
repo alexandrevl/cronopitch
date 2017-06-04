@@ -5,6 +5,7 @@
    var fontSizeTimer = "30vw";
    var fontSizeInfo = "10vw";
    var minutesLeft = 0;
+   var isPaused = false;
    $(function() {
        $("#resetTime").hide();
        $("#setTime").click(function() {
@@ -13,6 +14,16 @@
        $("#resetTime").click(function() {
            resetTimer();
        });
+       $("#displayTimer").click(function() {
+           if (countDownDate != null) {
+               if (timer == null) {
+                   resumeTimer();
+               } else {
+                   pauseTimer();
+               }
+           }
+       });
+
        countDownDateCookie = readCookie('time');
        if (countDownDateCookie != null) {
            var now = new Date();
@@ -20,6 +31,11 @@
                countDownDate = countDownDateCookie;
                setTimer(countDownDateCookie);
            }
+       }
+       isPaused = readCookie('timerPaused');
+       if (isPaused) {
+           var timerPausedTimer = readCookie('timerPausedTime');
+           setTimer(new Date().getTime() + parseInt(timerPausedTimer));
        }
        $(window).keydown(function(e) {
            switch (e.keyCode) {
@@ -50,10 +66,11 @@
            blinkTimer = setInterval(function() {
                $("#displayTimer").fadeOut(500, function() {
                    $(this).fadeIn(500);
-                   setTimeCookie(new Date().getTime() + distance + 1000);
                });
            }, 500);
            createCookie('timerPaused', true, 7);
+           createCookie('timerPausedTime', distance, 7);
+           eraseCookie('time');
        }
    }
    var isResumed = false;
@@ -61,8 +78,9 @@
    function resumeTimer() {
        eraseCookie('timerPaused');
        clearInterval(blinkTimer);
-       var countDownDate = new Date().getTime() + distance;
+       countDownDate = new Date().getTime() + distance;
        isResumed = true;
+       isPaused = false;
        setTimeCookie(countDownDate);
        setTimer(countDownDate);
    }
@@ -71,8 +89,9 @@
        if (timer != null) {
            clearInterval(timer);
        }
+       isPaused = false;
        minutesLeft = $("#time").find(":selected").val();
-       countDownDate = new Date().getTime() + (60000 * minutesLeft + 800);
+       countDownDate = new Date().getTime() + (60000 * minutesLeft + 1000);
        //countDownDate = new Date().getTime() + (15000);
        setTimeCookie(countDownDate);
        setTimer(countDownDate);
@@ -98,6 +117,7 @@
 
    function setTimer(countDownDate) {
        //console.log('Teste entrada');
+       this.countDownDate = countDownDate;
        $("#advanced").hide();
        $("#setTime").hide();
        $("#time").hide();
@@ -145,7 +165,6 @@
                $("body").css("background-color", "#FFFFFF");
                document.getElementById("displayTimer").innerHTML = "FINISHED";
            }
-           var isPaused = readCookie('timerPaused');
            if (isPaused) {
                pauseTimer();
            }
