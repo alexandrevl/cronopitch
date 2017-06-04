@@ -6,23 +6,27 @@
    var fontSizeInfo = "10vw";
    var minutesLeft = 0;
    $(function() {
+       $("#resetTime").hide();
        $("#setTime").click(function() {
            prepareTimer();
        });
        $("#resetTime").click(function() {
            resetTimer();
        });
-       var countDownDateCookie = readCookie('time');
+       countDownDateCookie = readCookie('time');
        if (countDownDateCookie != null) {
            var now = new Date();
            if (countDownDateCookie > now.getTime()) {
+               countDownDate = countDownDateCookie;
                setTimer(countDownDateCookie);
            }
        }
        $(window).keydown(function(e) {
            switch (e.keyCode) {
                case 27:
-                   resetTimer();
+                   if (timer != null) {
+                       resetTimer();
+                   }
                    return;
                case 32:
                    if (countDownDate == null) {
@@ -35,16 +39,8 @@
                        }
                    }
                    return;
-               case 82:
-                   if (timer != null) {
-                       resetTimer();
-                   } else {
-                       prepareTimer();
-                   }
-                   return;
            }
        });
-       $("#resetTime").hide();
    });
    var blinkTimer = null;
 
@@ -55,13 +51,16 @@
            blinkTimer = setInterval(function() {
                $("#displayTimer").fadeOut(500, function() {
                    $(this).fadeIn(500);
+                   setTimeCookie(new Date().getTime() + distance + 1000);
                });
-           }, 500)
+           }, 500);
+           createCookie('timerPaused', true, 7);
        }
    }
    var isResumed = false;
 
    function resumeTimer() {
+       eraseCookie('timerPaused');
        clearInterval(blinkTimer);
        var countDownDate = new Date().getTime() + distance;
        isResumed = true;
@@ -83,23 +82,24 @@
    function resetTimer() {
        if (timer != null) {
            clearInterval(timer);
+           clearInterval(blinkTimer);
+           timer = null;
+           eraseCookie('time');
+           eraseCookie('timerPaused');
+           $("body").css("background-color", "#FFFFFF");
+           $("#setTime").show();
+           $("#time").show();
+           $("#advanced").show();
+           $("#resetTime").hide();
+           $("#displayTimer").css("font-size", fontSizeInfo);
+           $("#displayTimer").text("Set your timer");
+           countDownDate = null;
        }
-       clearInterval(blinkTimer);
-       timer = null;
-       countDownDate = new Date().getTime();
-       setTimeCookie(countDownDate);
-       $("body").css("background-color", "#FFFFFF");
-       $("#setTime").show();
-       $("#time").show();
-       $("#advanced").show();
-       $("#resetTime").hide();
-       $("#displayTimer").css("font-size", fontSizeInfo);
-       $("#displayTimer").text("Set your timer");
-       countDownDate = null;
    }
    var distance = 0;
 
    function setTimer(countDownDate) {
+       //console.log('Teste entrada');
        $("#advanced").hide();
        $("#setTime").hide();
        $("#time").hide();
@@ -147,6 +147,10 @@
                $("body").css("background-color", "#FFFFFF");
                document.getElementById("displayTimer").innerHTML = "FINISHED";
            }
+           var isPaused = readCookie('timerPaused');
+           if (isPaused) {
+               pauseTimer();
+           }
        }, 100);
    }
 
@@ -158,6 +162,7 @@
            expires = "; expires=" + date.toUTCString();
        }
        document.cookie = name + "=" + value + expires + "; path=/";
+       //console.log(name + "=" + value + expires + "; path=/");
    }
 
    function readCookie(name) {
@@ -175,6 +180,6 @@
        createCookie(name, "", -1);
    }
 
-   function setTimeCookie(minutes) {
-       createCookie('time', minutes, 7);
+   function setTimeCookie(countDownDate) {
+       createCookie('time', countDownDate, 7);
    }
