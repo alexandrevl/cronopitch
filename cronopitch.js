@@ -55,6 +55,9 @@
                            pauseTimer();
                        }
                    }
+                   if (countDownDate == null && timer == null) {
+                       resetTimer();
+                   }
                    return;
            }
        });
@@ -170,8 +173,8 @@
                //$("#displayTimer").css({ 'color': '#000000' });
                //$("body").css("background-color", "#FFFFFF");
                document.getElementById("displayTimer").innerHTML = "0:00";
-               this.countDownDate = null;
-               this.timer = null;
+               countDownDate = null;
+               timer = null;
                showFrontLayer();
            }
            if (isPaused) {
@@ -211,11 +214,31 @@
    }
 
    function showFrontLayer() {
-       document.getElementById('bg_mask').style.visibility = 'visible';
-       document.getElementById('frontlayer').style.visibility = 'visible';
+       //animateRotate(-20);
+       $("#bg_mask").css({ visibility: "visible", opacity: 0.0 }).animate({ opacity: 1.0 }, 1000);
+       $("#frontlayer").css({ visibility: "visible", opacity: 0.0 }).animate({ opacity: 1.0 }, 1000);
    }
 
    function hideFrontLayer() {
        document.getElementById('bg_mask').style.visibility = 'hidden';
        document.getElementById('frontlayer').style.visibility = 'hidden';
+   }
+
+   function animateRotate(angle) {
+       // caching the object for performance reasons
+       var $elem = $('#bg_mask');
+
+       // we use a pseudo object for the animation
+       // (starts from `0` to `angle`), you can name it as you want
+       $({ deg: 0 }).animate({ deg: angle }, {
+           duration: 1,
+           step: function(now) {
+               // in the step-callback (that is fired each step of the animation),
+               // you can use the `now` paramter which contains the current
+               // animation-position (`0` up to `angle`)
+               $elem.css({
+                   transform: 'rotate(' + now + 'deg)'
+               });
+           }
+       });
    }
