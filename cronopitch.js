@@ -98,7 +98,7 @@
        isPaused = false;
        minutesLeft = $("#time").find(":selected").val();
        countDownDate = new Date().getTime() + (60000 * minutesLeft + 1000);
-       //countDownDate = new Date().getTime() + (3000);
+       //countDownDate = new Date().getTime() + (12000);
        setTimeCookie(countDownDate);
        setTimer(countDownDate);
    }
@@ -153,15 +153,19 @@
            if (seconds < 10) {
                seconds = "0" + seconds;
            }
-
            // Display the result in the element with id="displayTimer"
            if (hours > 0) {
                $("#displayTimer").text(hours + ":" + minutes + ":" + seconds);
            } else {
                $("#displayTimer").text(minutes + ":" + seconds);
                if (minutes == 0 && seconds <= 10) {
-                   $("body").css("background-color", "#FF0000");
-                   $("#displayTimer").css("color", "#FFFFFF");
+                   var color = "#FF0000";
+                   if (seconds % 2 == 0) {
+                       color = "#FF0000";
+                   }
+                   //console.log(color);
+                   $("body").css("background-color", color);
+                   $("#displayTimer").css("color", '#FFFFFF');
                }
            }
 
