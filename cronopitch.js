@@ -110,6 +110,7 @@
        isPaused = false;
        minutesLeft = $("#time").find(":selected").val();
        countDownDate = new Date().getTime() + (60000 * minutesLeft + 1000);
+
        //countDownDate = new Date().getTime() + (12000);
        setTimeCookie(countDownDate);
        setTimer(countDownDate);
@@ -132,6 +133,9 @@
        $("#displayTimer").text("Set your timer");
        $("#displayTimer").fadeIn(1);
        $("#displayTimer").css({ 'color': '#000000' });
+       $("#pause").css("color", '#000000');
+       $("#play").css("color", '#000000');
+       $("#resetTime").css("color", '#000000');
        countDownDate = null;
        hideFrontLayer();
    }
@@ -182,6 +186,9 @@
                    //console.log(color);
                    $("body").css("background-color", color);
                    $("#displayTimer").css("color", '#FFFFFF');
+                   $("#pause").css("color", '#FFFFFF');
+                   $("#play").css("color", '#FFFFFF');
+                   $("#resetTime").css("color", '#FFFFFF');
                }
            }
 
