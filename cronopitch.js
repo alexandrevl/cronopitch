@@ -10,6 +10,7 @@
        $("#resetTime").hide();
        $("#play").hide();
        $("#pause").hide();
+       $("#invertColors").hide();
        $("#setTime").click(function() {
            prepareTimer();
        });
@@ -21,6 +22,9 @@
        });
        $("#pause").click(function() {
            pauseTimer();
+       });
+       $("#invertColors").click(function() {
+           invertColors();
        });
        $("#bg_mask").click(function() {
            resetTimer();
@@ -72,6 +76,29 @@
    });
 
    var blinkTimer = null;
+   var isInvertedColors = 0;
+
+   function invertColors() {
+       if (isInvertedColors == 1) {
+           $("body").css("background-color", "#FFFFFF");
+           $("#displayTimer").css({ 'color': '#000000' });
+           $("#pause").css("color", '#000000');
+           $("#play").css("color", '#000000');
+           $("#resetTime").css("color", '#000000');
+           $("#invertColors").css("color", '#000000');
+           isInvertedColors = 0;
+       } else {
+           $("body").css("background-color", "#000000");
+           $("#displayTimer").css({ 'color': '#FFFFFF' });
+           $("#pause").css("color", '#FFFFFF');
+           $("#play").css("color", '#FFFFFF');
+           $("#resetTime").css("color", '#FFFFFF');
+           $("#invertColors").css("color", '#FFFFFF');
+           isInvertedColors = 1;
+       }
+       eraseCookie('invertedColors');
+       createCookie('invertedColors', isInvertedColors, 7);
+   }
 
    function pauseTimer() {
        if (timer != null) {
@@ -122,10 +149,12 @@
        timer = null;
        eraseCookie('time');
        eraseCookie('timerPaused');
+       //eraseCookie('invertedColors');
        $("body").css("background-color", "#FFFFFF");
        $("#setTime").show();
        $("#time").show();
        $("#advanced").show();
+       $("#invertColors").hide();
        $("#resetTime").hide();
        $("#play").hide();
        $("#pause").hide();
@@ -136,12 +165,18 @@
        $("#pause").css("color", '#000000');
        $("#play").css("color", '#000000');
        $("#resetTime").css("color", '#000000');
+       $("#invertColors").css("color", '#000000');
        countDownDate = null;
        hideFrontLayer();
    }
    var distance = 0;
 
    function setTimer(countDownDate) {
+       var invertedColors = parseInt(readCookie('invertedColors'));
+       if (invertedColors == 1) {
+           isInvertedColors = 0;
+           invertColors();
+       }
        //console.log('Teste entrada');
        this.countDownDate = countDownDate;
        $("#advanced").hide();
@@ -154,7 +189,7 @@
        }
        $("#displayTimer").css("font-size", fontSizeTimer);
        $("#resetTime").show();
-       //$("#play").show();
+       $("#invertColors").show();
        $("#pause").show();
        // Update the count down every 1 second
        timer = setInterval(function() {
