@@ -7,10 +7,7 @@
    var minutesLeft = 0;
    var isPaused = false;
    $(function() {
-       $("#resetTime").hide();
-       $("#play").hide();
-       $("#pause").hide();
-       $("#invertColors").hide();
+       $("#controls").hide();
        $("#setTime").click(function() {
            prepareTimer();
        });
@@ -137,7 +134,6 @@
        isPaused = false;
        minutesLeft = $("#time").find(":selected").val();
        countDownDate = new Date().getTime() + (60000 * minutesLeft + 1000);
-
        //countDownDate = new Date().getTime() + (3000);
        setTimeCookie(countDownDate);
        setTimer(countDownDate);
@@ -151,15 +147,10 @@
        eraseCookie('timerPaused');
        //eraseCookie('invertedColors');
        $("body").css("background-color", "#FFFFFF");
-       $("#setTime").show();
-       $("#time").show();
-       $("#advanced").show();
-       $("#invertColors").hide();
-       $("#resetTime").hide();
-       $("#play").hide();
-       $("#pause").hide();
+       $("#controls").hide();
+       $("#welcomeCard").show();
        $("#displayTimer").css("font-size", fontSizeInfo);
-       $("#displayTimer").text("Set your timer");
+       $("#displayTimer").text("");
        $("#displayTimer").fadeIn(1);
        $("#displayTimer").css({ 'color': '#000000' });
        $("#pause").css("color", '#000000');
@@ -179,18 +170,15 @@
        }
        //console.log('Teste entrada');
        this.countDownDate = countDownDate;
-       $("#advanced").hide();
-       $("#setTime").hide();
-       $("#time").hide();
        if (!isResumed) {
            $("#displayTimer").text(minutesLeft + ":00");
        } else {
            isResumed = false;
        }
        $("#displayTimer").css("font-size", fontSizeTimer);
-       $("#resetTime").show();
-       $("#invertColors").show();
-       $("#pause").show();
+       $("#controls").show();
+       $("#play").hide();
+       $("#welcomeCard").hide();
        // Update the count down every 1 second
        timer = setInterval(function() {
 
