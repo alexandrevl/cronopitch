@@ -138,7 +138,7 @@
        minutesLeft = $("#time").find(":selected").val();
        countDownDate = new Date().getTime() + (60000 * minutesLeft + 1000);
 
-       //countDownDate = new Date().getTime() + (12000);
+       //countDownDate = new Date().getTime() + (3000);
        setTimeCookie(countDownDate);
        setTimer(countDownDate);
    }
@@ -224,6 +224,7 @@
                    $("#pause").css("color", '#FFFFFF');
                    $("#play").css("color", '#FFFFFF');
                    $("#resetTime").css("color", '#FFFFFF');
+                   $("#invertColors").css("color", '#FFFFFF');
                }
            }
 
