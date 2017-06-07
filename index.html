@@ -82,14 +82,18 @@
         <a href="#" aria-label="Reset" title="Reset (esc)" style="color:#000000" id="resetTime"><i class="fa fa-undo fa-2x">&nbsp;&nbsp;&nbsp;&nbsp;</i></a>
         <a href="#" aria-label="Invert colors" title="Invert Colors" style="color:#000000" id="invertColors"><i class="fa fa-adjust fa-2x" aria-hidden="true"></i></a>
     </div>
-    <div align='center' id='welcomeCard'>
-        <div class="card w-25" align='left'>
-            <img class="card-img-top" src="cronopitch.jpeg">
-            <div class="card-block ">
-                <h4 class="card-title">Let's start</h4>
-                <p class="card-text">Set up how many minutes will be the presentation and start! ;)</p>
-                <div align='center'>
-                    <select id="time" class="custom-select">
+    <div class="row">
+        <div class="col-1 col-sm-3 col-md-4">
+        </div>
+        <div class="col-10 col-sm-6 col-md-4">
+            <div align='center' id='welcomeCard'>
+                <div class="card" align='left'>
+                    <img class="card-img-top" src="cronopitch.jpeg">
+                    <div class="card-block ">
+                        <h4 class="card-title">Let's start</h4>
+                        <p class="card-text">Set up how many minutes will be the presentation and hit start! ;)</p>
+                        <div align='center'>
+                            <select id="time" class="custom-select">
                         <option value="1">1 minute</option>
                         <option value="3">3 minutes</option>
                         <option value="5">5 minutes</option>
@@ -98,13 +102,16 @@
                         <option value="20">20 minutes</option>
                         <option value="30">30 minutes</option>
                     </select> &nbsp;
-                    <a id="setTime" class="btn btn-primary" aria-label="Start" title="Start (spacebar)"><i class="fa fa-play" id="play" style="color: #FFFFFF"></i></a> &nbsp;
-                    <a class="btn btn-secondary" id="advanced" href="#" aria-label="Advanced Option" title="Advanced Options (soon)"><i class="fa fa-cog"></i></a>
+                            <a id="setTime" class="btn btn-primary" aria-label="Start" title="Start (spacebar)"><i class="fa fa-play" id="play" style="color: #FFFFFF"></i></a> &nbsp;
+                            <a class="btn btn-secondary" id="advanced" href="#" aria-label="Advanced Option" title="Advanced Options (soon)"><i class="fa fa-cog"></i></a>
+                        </div>
+                    </div>
                 </div>
             </div>
+            <div class="col-1 col-sm-3 col-md-4">
+            </div>
         </div>
-    </div>
-    <!--
+        <!--
     <div class="row">
         <div class="col-2 col-md-4">
         </div>
