@@ -8,11 +8,19 @@
    var isPaused = false;
    $(function() {
        $("#resetTime").hide();
+       $("#play").hide();
+       $("#pause").hide();
        $("#setTime").click(function() {
            prepareTimer();
        });
        $("#resetTime").click(function() {
            resetTimer();
+       });
+       $("#play").click(function() {
+           resumeTimer();
+       });
+       $("#pause").click(function() {
+           pauseTimer();
        });
        $("#bg_mask").click(function() {
            resetTimer();
@@ -77,6 +85,8 @@
            createCookie('timerPaused', true, 7);
            createCookie('timerPausedTime', distance, 7);
            eraseCookie('time');
+           $("#play").show();
+           $("#pause").hide();
        }
    }
    var isResumed = false;
@@ -89,6 +99,8 @@
        isPaused = false;
        setTimeCookie(countDownDate);
        setTimer(countDownDate);
+       $("#play").hide();
+       $("#pause").show();
    }
 
    function prepareTimer() {
@@ -114,6 +126,8 @@
        $("#time").show();
        $("#advanced").show();
        $("#resetTime").hide();
+       $("#play").hide();
+       $("#pause").hide();
        $("#displayTimer").css("font-size", fontSizeInfo);
        $("#displayTimer").text("Set your timer");
        $("#displayTimer").fadeIn(1);
@@ -136,6 +150,8 @@
        }
        $("#displayTimer").css("font-size", fontSizeTimer);
        $("#resetTime").show();
+       //$("#play").show();
+       $("#pause").show();
        // Update the count down every 1 second
        timer = setInterval(function() {
 
