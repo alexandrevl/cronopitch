@@ -77,7 +77,10 @@
     <div id="bg_mask">
         <div id="frontlayer" align='center'>Applause</div>
     </div>
-    <p id="displayTimer" style="font-size:12vw; font-family:'Droid Sans Mono'" align="center"></p>
+    <p id="displayTimer" style="font-size:30vw; font-family:'Droid Sans Mono'" align="center"></p>
+    <div align='center' id='showImgTimer' style='vertical-align: top' aria-hidden="true">
+        <img src="" height="10%" id='imgTimer'><br><br><br>
+    </div>
     <div align="center" id="controls">
         <a href="#" aria-label="Resume" title="Resume (spacebar)" style="color:#000000" id="play"><i class="fa fa-play fa-2x">&nbsp;&nbsp;&nbsp;&nbsp;</i></a>
         <a href="#" aria-label="Pause" title="Pause (spacebar)" style="color:#000000" id="pause"><i class="fa fa-pause fa-2x">&nbsp;&nbsp;&nbsp;&nbsp;</i></a>
@@ -105,12 +108,61 @@
                         <option value="30">30 minutes</option>
                     </select> &nbsp;
                             <a id="setTime" class="btn btn-primary" aria-label="Start" title="Start (spacebar)"><i class="fa fa-play" id="play" style="color: #FFFFFF"></i></a> &nbsp;
-                            <a class="btn btn-secondary" id="advanced" href="#" aria-label="Advanced Option" title="Advanced Options (soon)"><i class="fa fa-cog"></i></a>
+                            <a class="btn btn-secondary" id="advanced" href="#" aria-label="Advanced Option" title="Advanced Options (soon)" data-toggle="modal" data-target="#config"><i class="fa fa-cog"></i></a>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-1 col-sm-3 col-md-4">
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="config" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Advanced Settings</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="fontColorDefault">Font Color</label>
+                            <div class="input-group margin-bottom-sm">
+                                <span class="input-group-addon"><i class="fa fa-hashtag fa-fw"></i></span>
+                                <input type="text" class="form-control" id="fontColorDefault" placeholder="000000" maxlength="6">
+                            </div>
+                        </div>
+                        <div class=" form-group">
+                            <label for="bgColorDefault">Background Color</label>
+                            <div class="input-group margin-bottom-sm">
+                                <span class="input-group-addon"><i class="fa fa-hashtag fa-fw"></i></span>
+                                <input type="text" class="form-control" id="bgColorDefault" placeholder="FFFFFF" maxlength="6">
+                            </div>
+                        </div>
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="checkbox" value="1" id='showImage'>
+                                Show a logo?
+                            </label>
+                        </div>
+                        <div class=" form-group" id='imgBox' style='display: none'>
+                            <label for="bgColorDefault">Image</label>
+                            <div class="input-group margin-bottom-sm">
+                                <span class="input-group-addon"><i class="fa fa-picture-o fa-fw"></i></span>
+                                <input type="text" class="form-control" id="imgSet" placeholder="http://url.image" maxlength="150">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer ">
+                    <button type="button " class="btn btn-secondary " data-dismiss="modal">Close</button>
+                    <button type="button " class="btn btn-primary " id='saveAdvanced'>Save changes</button>
+                </div>
             </div>
         </div>
     </div>
