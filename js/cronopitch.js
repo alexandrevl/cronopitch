@@ -18,26 +18,32 @@ var config = {
 }
 
 $(function() {
-    $("#fontColorDefault").val(config.fontColorDefault.replace('#', ''));
-    $("#bgColorDefault").val(config.bgColorDefault.replace('#', ''));
+    $("#fontColorDefault").val(config.fontColorDefault);
+    $("#bgColorDefault").val(config.bgColorDefault);
 
     $("#controls").hide();
     $("#showImgTimer").hide();
 
     $("#saveAdvanced").click(function() {
-        if ($("#fontColorDefault").val().length == 6) {
-            config.fontColorDefault = '#' + $("#fontColorDefault").val();
-            config.bgColorInverted = '#' + $("#fontColorDefault").val();
+        console.log($("#fontColorDefault").val());
+        if ($("#fontColorDefault").val().length == 7) {
+            config.fontColorDefault = $("#fontColorDefault").val();
+            config.bgColorInverted = $("#fontColorDefault").val();
         }
-        if ($("#bgColorDefault").val().length == 6) {
-            config.bgColorDefault = '#' + $("#bgColorDefault").val();
-            config.fontColorInverted = '#' + $("#bgColorDefault").val();
+        if ($("#bgColorDefault").val().length == 7) {
+            config.bgColorDefault = $("#bgColorDefault").val();
+            config.fontColorInverted = $("#bgColorDefault").val();
         }
         if ($("#imgSet").val().length > 0 && $("#showImage").is(':checked')) {
             config.imgTimer = $("#imgSet").val();
         } else {
             config.imgTimer = null;
         }
+        $('#config').modal('toggle');
+    });
+    $("#closeAdvanced").click(function() {
+        $("#fontColorDefault").val(config.fontColorDefault);
+        $("#bgColorDefault").val(config.bgColorDefault);
         $('#config').modal('toggle');
     });
 
@@ -48,7 +54,19 @@ $(function() {
             $("#imgBox").hide();
         }
     });
-
+    $("#time").change(function() {
+        if ($(this).val() == -1) {
+            $('#custom').modal('toggle');
+        }
+    });
+    $("#saveCustom").click(function() {
+        $("#customMinutes").val();
+        $('#custom').modal('toggle');
+    });
+    $("#closeCustom").click(function() {
+        //$("#time").select(10);
+        $('#custom').modal('toggle');
+    });
     $("#setTime").click(function() {
         prepareTimer();
     });
@@ -109,6 +127,33 @@ $(function() {
                     resetTimer();
                 }
                 return;
+        }
+    });
+    var colpick = $('.color').each(function() {
+        $(this).minicolors({
+            control: $(this).attr('data-control') || 'hue',
+            inline: $(this).attr('data-inline') === 'true',
+            letterCase: 'uppercase',
+            opacity: false,
+            change: function(hex, opacity) {
+                if (!hex) return;
+                if (opacity) hex += ', ' + opacity;
+                try {
+                    //console.log(hex);
+                } catch (e) {}
+                $(this).select();
+            },
+            theme: 'bootstrap'
+        });
+    });
+
+    var $inlinehex = $('#inlinecolorhex h3 small');
+    $('#inlinecolors').minicolors({
+        inline: true,
+        theme: 'bootstrap',
+        change: function(hex) {
+            if (!hex) return;
+            $inlinehex.html(hex);
         }
     });
 });
@@ -172,12 +217,14 @@ function prepareTimer() {
     if (timer != null) {
         clearInterval(timer);
     }
-    isPaused = false;
-    minutesLeft = $("#time").find(":selected").val();
-    countDownDate = new Date().getTime() + (60000 * minutesLeft + 1000);
-    //countDownDate = new Date().getTime() + (15000);
-    setTimeCookie(countDownDate);
-    setTimer(countDownDate);
+    if ($("#time").find(":selected").val() > 0) {
+        isPaused = false;
+        minutesLeft = $("#time").find(":selected").val();
+        countDownDate = new Date().getTime() + (60000 * minutesLeft + 1000);
+        //countDownDate = new Date().getTime() + (15000);
+        setTimeCookie(countDownDate);
+        setTimer(countDownDate);
+    }
 }
 
 function resetTimer() {
