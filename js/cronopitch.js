@@ -3,7 +3,7 @@ var countDownDate = null;
 var minutesLeft = 0;
 var isPaused = false;
 
-var config = {
+var configDefault = {
     'fontColorInverted': '#FFFFFF',
     'bgColorInverted': '#000000',
     'fontColorDefault': '#000000',
@@ -12,20 +12,28 @@ var config = {
     'bgColorAlert': '#FF0000',
     'secondsAlert': 10,
     'showMsgEnd': true,
+    'msgEnd': 'Applause',
     //'imgTimer': 'https://www.labbs.com.br/wp-content/uploads/2017/05/Ativo-1.png'
     //'imgTimer': 'http://static1.squarespace.com/static/5747177ee321402733fd16cd/t/57477e5f07eaa01bd1a504ac/1496683053127'
     'imgTimer': null
 }
+var config = null;
 
 $(function() {
+    config = JSON.parse(JSON.stringify(configDefault));
+    var configCookie = readCookie('config');
+    if (configCookie != null) {
+        config = JSON.parse(configCookie);
+    }
     $("#fontColorDefault").val(config.fontColorDefault);
     $("#bgColorDefault").val(config.bgColorDefault);
+    $("#msgEnd").val(config.msgEnd);
+    $("#secondsAlert").val(config.secondsAlert);
 
     $("#controls").hide();
     $("#showImgTimer").hide();
 
     $("#saveAdvanced").click(function() {
-        console.log($("#fontColorDefault").val());
         if ($("#fontColorDefault").val().length == 7) {
             config.fontColorDefault = $("#fontColorDefault").val();
             config.bgColorInverted = $("#fontColorDefault").val();
@@ -39,11 +47,54 @@ $(function() {
         } else {
             config.imgTimer = null;
         }
+        if ($("#msgEnd").val().length > 0 && $("#showMsgEnd").is(':checked')) {
+            config.msgEnd = $("#msgEnd").val();
+        } else {
+            config.msgEnd = null;
+        }
+        if ($("#secondsAlert").val() > 0) {
+            config.secondsAlert = $("#secondsAlert").val();
+        } else {
+            config.secondsAlert = null;
+        }
+        eraseCookie('config');
+        createCookie('config', JSON.stringify(config), 30);
         $('#config').modal('toggle');
     });
     $("#closeAdvanced").click(function() {
         $("#fontColorDefault").val(config.fontColorDefault);
         $("#bgColorDefault").val(config.bgColorDefault);
+        $("#msgEnd").val(config.msgEnd);
+        $("#secondsAlert").val(config.secondsAlert);
+        $('#config').modal('toggle');
+    });
+    $("#advanced").click(function() {
+        if (config.showMsgEnd != true) {
+            $('#showMsgEnd').prop('checked', false);
+            $("#msgEndGroup").hide();
+        } else {
+            $('#showMsgEnd').prop('checked', true);
+            $("#msgEndGroup").show();
+        }
+        if (config.imgTimer != null) {
+            $('#showImage').prop('checked', true);
+            $("#imgBox").show();
+            $("#imgSet").val(config.imgTimer);
+        } else {
+            $('#showImage').prop('checked', false);
+            $("#imgBox").hide();
+            $("#imgSet").val('');
+        }
+        $("#fontColorDefault").minicolors({
+            'value': { color: config.fontColorDefault, opacity: 1 }
+        });
+        $("#fontColorDefault").val(config.fontColorDefault);
+        $("#bgColorDefault").val(config.bgColorDefault);
+        $("#msgEnd").val(config.msgEnd);
+        $("#secondsAlert").val(config.secondsAlert);
+    });
+    $("#resetConfig").click(function() {
+        config = JSON.parse(JSON.stringify(configDefault));
         $('#config').modal('toggle');
     });
 
@@ -54,21 +105,49 @@ $(function() {
             $("#imgBox").hide();
         }
     });
+    $("#showMsgEnd").click(function() {
+        if ($("#showMsgEnd").is(':checked')) {
+            config.showMsgEnd = true;
+            $("#msgEndGroup").show();
+        } else {
+            config.showMsgEnd = false;
+            $("#msgEndGroup").hide();
+        }
+    });
     $("#time").change(function() {
         if ($(this).val() == -1) {
             $('#custom').modal('toggle');
         }
     });
     $("#saveCustom").click(function() {
-        $("#customMinutes").val();
+        var minutes = parseInt($("#customMinutes").val());
+        switch (minutes) {
+            case 1:
+            case 3:
+            case 5:
+            case 10:
+            case 15:
+            case 20:
+            case 30:
+                break;
+            default:
+                $("#time").append(new Option($("#customMinutes").val() + ' minutes', minutes));
+                break;
+        }
+        $('#time').val(minutes);
         $('#custom').modal('toggle');
     });
     $("#closeCustom").click(function() {
-        //$("#time").select(10);
+        $('#time').val("10");
         $('#custom').modal('toggle');
     });
+    $("#undoTime").click(function() {
+        if (!cookiesTimer()) {
+            prepareTimer(0);
+        }
+    });
     $("#setTime").click(function() {
-        prepareTimer();
+        prepareTimer(0);
     });
     $("#resetTime").click(function() {
         resetTimer();
@@ -94,28 +173,25 @@ $(function() {
             }
         }
     });
-
-    countDownDateCookie = readCookie('time');
-    if (countDownDateCookie != null) {
-        var now = new Date();
-        if (countDownDateCookie > now.getTime()) {
-            countDownDate = countDownDateCookie;
-            setTimer(countDownDateCookie);
-        }
-    }
-    isPaused = readCookie('timerPaused');
-    if (isPaused) {
-        var timerPausedTimer = readCookie('timerPausedTime');
-        setTimer(new Date().getTime() + parseInt(timerPausedTimer));
-    }
+    cookiesTimer();
     $(window).keydown(function(e) {
         switch (e.keyCode) {
+            case 73:
+                if (countDownDate != null) {
+                    invertColors();
+                }
+                return;
+            case 82:
+                if (countDownDate != null) {
+                    prepareTimer(0);
+                }
+                return;
             case 27:
                 resetTimer();
                 return;
             case 32:
                 if (countDownDate == null) {
-                    prepareTimer();
+                    prepareTimer(0);
                 } else {
                     if (timer == null) {
                         resumeTimer();
@@ -168,19 +244,15 @@ function invertColors() {
         $("#pause").css("color", config.fontColorInverted);
         $("#play").css("color", config.fontColorInverted);
         $("#resetTime").css("color", config.fontColorInverted);
+        $("#undoTime").css("color", config.fontColorInverted);
         $("#invertColors").css("color", config.fontColorInverted);
         isInvertedColors = 1;
     } else {
-        $("body").css("background-color", config.bgColorDefault);
-        $("#displayTimer").css('color', config.fontColorDefault);
-        $("#pause").css("color", config.fontColorDefault);
-        $("#play").css("color", config.fontColorDefault);
-        $("#resetTime").css("color", config.fontColorDefault);
-        $("#invertColors").css("color", config.fontColorDefault);
+        setColorDefault();
         isInvertedColors = 0;
     }
     eraseCookie('invertedColors');
-    createCookie('invertedColors', isInvertedColors, 7);
+    createCookie('invertedColors', isInvertedColors, 30);
 }
 
 function pauseTimer() {
@@ -192,8 +264,8 @@ function pauseTimer() {
                 $(this).fadeIn(500);
             });
         }, 500);
-        createCookie('timerPaused', true, 7);
-        createCookie('timerPausedTime', distance, 7);
+        createCookie('timerPaused', true, 30);
+        createCookie('timerPausedTime', distance, 30);
         eraseCookie('time');
         $("#play").show();
         $("#pause").hide();
@@ -213,15 +285,37 @@ function resumeTimer() {
     $("#pause").show();
 }
 
-function prepareTimer() {
+function cookiesTimer() {
+    countDownDateCookie = readCookie('time');
+    if (countDownDateCookie != null) {
+        var now = new Date();
+        if (countDownDateCookie > now.getTime()) {
+            countDownDate = countDownDateCookie;
+            setTimer(countDownDateCookie);
+        }
+        isPaused = readCookie('timerPaused');
+        if (isPaused) {
+            var timerPausedTimer = readCookie('timerPausedTime');
+            setTimer(new Date().getTime() + parseInt(timerPausedTimer));
+        }
+        return true;
+    }
+    return false;
+}
+
+function prepareTimer(minutesLeft) {
+    $("#invertColors").show();
     if (timer != null) {
         clearInterval(timer);
     }
     if ($("#time").find(":selected").val() > 0) {
         isPaused = false;
-        minutesLeft = $("#time").find(":selected").val();
+        if (minutesLeft == 0) {
+            minutesLeft = $("#time").find(":selected").val();
+        }
         countDownDate = new Date().getTime() + (60000 * minutesLeft + 1000);
-        //countDownDate = new Date().getTime() + (15000);
+        //countDownDate = new Date().getTime() + (20000);
+
         setTimeCookie(countDownDate);
         setTimer(countDownDate);
     }
@@ -233,31 +327,33 @@ function resetTimer() {
     timer = null;
     eraseCookie('time');
     eraseCookie('timerPaused');
-    //eraseCookie('invertedColors');
-    $("body").css("background-color", '#FFFFFF');
+    eraseCookie('invertedColors');
+    $("#invertColors").show();
     $("#controls").hide();
     $("#welcomeCard").show();
     $("#displayTimer").text("");
     $("#displayTimer").fadeIn(1);
-    $("#displayTimer").css('color', config.fontColorDefault);
-    $("#pause").css("color", config.fontColorDefault);
-    $("#play").css("color", config.fontColorDefault);
-    $("#resetTime").css("color", config.fontColorDefault);
-    $("#invertColors").css("color", config.fontColorDefault);
+    setColorDefault();
     $("#showImgTimer").hide();
     $("#displayTimer").css("fontSize", "30vw");
+    $("body").css("background-color", '#FFFFFF');
     countDownDate = null;
     hideFrontLayer();
 }
 var distance = 0;
 
-function setTimer(countDownDate) {
+function setColorDefault() {
     $("body").css("background-color", config.bgColorDefault);
     $("#displayTimer").css('color', config.fontColorDefault);
     $("#pause").css("color", config.fontColorDefault);
     $("#play").css("color", config.fontColorDefault);
     $("#resetTime").css("color", config.fontColorDefault);
+    $("#undoTime").css("color", config.fontColorDefault);
     $("#invertColors").css("color", config.fontColorDefault);
+}
+
+function setTimer(countDownDate) {
+    setColorDefault();
     var invertedColors = parseInt(readCookie('invertedColors'));
     if (invertedColors == 1) {
         isInvertedColors = 0;
@@ -312,6 +408,7 @@ function setTimer(countDownDate) {
                 $("#pause").css("color", config.fontColorAlert);
                 $("#play").css("color", config.fontColorAlert);
                 $("#resetTime").css("color", config.fontColorAlert);
+                $("#undoTime").css("color", config.fontColorAlert);
                 $("#invertColors").hide();
             }
         }
@@ -360,11 +457,12 @@ function eraseCookie(name) {
 }
 
 function setTimeCookie(countDownDate) {
-    createCookie('time', countDownDate, 7);
+    createCookie('time', countDownDate, 30);
 }
 
 function showFrontLayer() {
     //animateRotate(-20);
+    $("#frontlayer").text(config.msgEnd);
     $("#bg_mask").css({ visibility: "visible", opacity: 0.0 }).animate({ opacity: 1.0 }, 1000);
     $("#frontlayer").css({ visibility: "visible", opacity: 0.0 }).animate({ opacity: 1.0 }, 1000);
 }
