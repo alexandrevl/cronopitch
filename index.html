@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta name=apple-mobile-web-app-capable content=yes>
     <meta name=apple-mobile-web-app-status-bar-style content=black>
-    <meta name=description content="A timer for your pitch. Now you have an easy and totally free tool to measure the time of your presentations.">
+    <meta name=description content="A timer for your pitch. Now you have an easy, totally free and fully customized chronometer to measure the time of your presentations or pitch sessions.">
     <link rel="icon" href="cronopitch.ico">
     <link rel="apple-touch-icon" sizes="114x114" href="cronopitch.png" />
     <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
@@ -23,6 +23,40 @@
 
     <link rel="stylesheet" type="text/css" media="all" href="css/jquery.minicolors.css">
     <script type="text/javascript" src="js/jquery.minicolors.min.js"></script>
+    <!-- Facebook Pixel Code -->
+    <script>
+        ! function(f, b, e, v, n, t, s) {
+            if (f.fbq) return;
+            n = f.fbq = function() {
+                n.callMethod ?
+                    n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+            };
+            if (!f._fbq) f._fbq = n;
+            n.push = n;
+            n.loaded = !0;
+            n.version = '2.0';
+            n.queue = [];
+            t = b.createElement(e);
+            t.async = !0;
+            t.src = v;
+            s = b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t, s)
+        }(window,
+            document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', '310003469443824', {
+            em: 'insert_email_variable'
+        });
+        fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=310003469443824&ev=PageView&noscript=1"
+/></noscript>
+    <!-- DO NOT MODIFY -->
+    <!-- End Facebook Pixel Code -->
+
+
+
+
     <script>
         (function(i, s, o, g, r, a, m) {
             i['GoogleAnalyticsObject'] = r;
@@ -70,7 +104,7 @@
             color: white;
             background-color: transparent;
             visibility: hidden;
-            border: 3px solid white;
+            border: none;
             z-index: 1;
         }
     </style>

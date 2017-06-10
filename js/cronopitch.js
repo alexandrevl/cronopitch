@@ -18,6 +18,7 @@ var configDefault = {
     'imgTimer': null
 }
 var config = null;
+var isShowAdvanced = false;
 
 $(function() {
     config = JSON.parse(JSON.stringify(configDefault));
@@ -59,6 +60,7 @@ $(function() {
         }
         eraseCookie('config');
         createCookie('config', JSON.stringify(config), 30);
+        isShowAdvanced = false;
         $('#config').modal('toggle');
     });
     $("#closeAdvanced").click(function() {
@@ -67,8 +69,10 @@ $(function() {
         $("#msgEnd").val(config.msgEnd);
         $("#secondsAlert").val(config.secondsAlert);
         $('#config').modal('toggle');
+        isShowAdvanced = false;
     });
     $("#advanced").click(function() {
+        isShowAdvanced = true;
         if (config.showMsgEnd != true) {
             $('#showMsgEnd').prop('checked', false);
             $("#msgEndGroup").hide();
@@ -142,8 +146,10 @@ $(function() {
         $('#custom').modal('toggle');
     });
     $("#undoTime").click(function() {
-        if (!cookiesTimer()) {
-            prepareTimer(0);
+        var minutesLeft = readCookie('minutesLeft');
+        if (minutesLeft != null) {
+            resetTimer();
+            prepareTimer(minutesLeft);
         }
     });
     $("#setTime").click(function() {
@@ -190,17 +196,19 @@ $(function() {
                 resetTimer();
                 return;
             case 32:
-                if (countDownDate == null) {
-                    prepareTimer(0);
-                } else {
-                    if (timer == null) {
-                        resumeTimer();
+                if (!isShowAdvanced) {
+                    if (countDownDate == null) {
+                        prepareTimer(0);
                     } else {
-                        pauseTimer();
+                        if (timer == null) {
+                            resumeTimer();
+                        } else {
+                            pauseTimer();
+                        }
                     }
-                }
-                if (countDownDate == null && timer == null) {
-                    resetTimer();
+                    if (countDownDate == null && timer == null) {
+                        resetTimer();
+                    }
                 }
                 return;
         }
@@ -313,9 +321,11 @@ function prepareTimer(minutesLeft) {
         if (minutesLeft == 0) {
             minutesLeft = $("#time").find(":selected").val();
         }
+        //minutesLeft = 5/60;
         countDownDate = new Date().getTime() + (60000 * minutesLeft + 1000);
         //countDownDate = new Date().getTime() + (20000);
-
+        createCookie('minutesLeft', minutesLeft, 30);
+        createCookie('time', countDownDate, 30);
         setTimeCookie(countDownDate);
         setTimer(countDownDate);
     }
