@@ -326,7 +326,7 @@ function cookiesTimer() {
     countDownDateCookie = readCookie('time');
     if (countDownDateCookie != null) {
         var now = new Date();
-        if (countDownDateCookie > now.getTime()) {
+        if (countDownDateCookie > now.getTime() || config.continuous) {
             countDownDate = countDownDateCookie;
             setTimer(countDownDateCookie);
         }
