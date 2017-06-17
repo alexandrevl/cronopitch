@@ -12,7 +12,8 @@ var configDefault = {
     'bgColorAlert': '#FF0000',
     'secondsAlert': 10,
     'showMsgEnd': true,
-    'msgEnd': 'Applause',
+    'continuous': false,
+    'msgEnd': "Time's up",
     //'imgTimer': 'https://www.labbs.com.br/wp-content/uploads/2017/05/Ativo-1.png'
     //'imgTimer': 'http://static1.squarespace.com/static/5747177ee321402733fd16cd/t/57477e5f07eaa01bd1a504ac/1496683053127'
     'imgTimer': null
@@ -42,6 +43,12 @@ $(function() {
         if ($("#bgColorDefault").val().length == 7) {
             config.bgColorDefault = $("#bgColorDefault").val();
             config.fontColorInverted = $("#bgColorDefault").val();
+        }
+        if ($("#continuous").is(':checked')) {
+            config.continuous = true;
+            config.showMsgEnd = false;
+        } else {
+            config.continuous = false;
         }
         if ($("#imgSet").val().length > 0 && $("#showImage").is(':checked')) {
             config.imgTimer = $("#imgSet").val();
@@ -73,6 +80,12 @@ $(function() {
     });
     $("#advanced").click(function() {
         isShowAdvanced = true;
+        if (config.continuous == true) {
+            $('#continuous').prop('checked', true);
+        } else {
+            $('#continuous').prop('checked', false);
+            $("#showMsgEnd").prop('disabled', false);
+        }
         if (config.showMsgEnd != true) {
             $('#showMsgEnd').prop('checked', false);
             $("#msgEndGroup").hide();
@@ -99,6 +112,8 @@ $(function() {
     });
     $("#resetConfig").click(function() {
         config = JSON.parse(JSON.stringify(configDefault));
+        eraseCookie('config');
+        createCookie('config', JSON.stringify(config), 30);
         $('#config').modal('toggle');
     });
 
@@ -107,6 +122,20 @@ $(function() {
             $("#imgBox").show();
         } else {
             $("#imgBox").hide();
+        }
+    });
+    $("#continuous").click(function() {
+        if ($("#continuous").is(':checked')) {
+            $('#showMsgEnd').attr('checked', false);
+            $("#showMsgEnd").prop('disabled', true);
+            $("#msgEndGroup").hide();
+        } else {
+            $("#showMsgEnd").prop('disabled', false);
+            if ($("#showMsgEnd").is(':checked')) {
+                $("#msgEndGroup").show();
+            } else {
+                $("#msgEndGroup").hide();
+            }
         }
     });
     $("#showMsgEnd").click(function() {
@@ -312,6 +341,7 @@ function cookiesTimer() {
 }
 
 function prepareTimer(minutesLeft) {
+    $("#displayTimer").css("fontSize", "30vw");
     $("#invertColors").show();
     if (timer != null) {
         clearInterval(timer);
@@ -323,7 +353,7 @@ function prepareTimer(minutesLeft) {
         }
         //minutesLeft = 5/60;
         countDownDate = new Date().getTime() + (60000 * minutesLeft + 1000);
-        //countDownDate = new Date().getTime() + (20000);
+        //countDownDate = new Date().getTime() + (5000);
         createCookie('minutesLeft', minutesLeft, 30);
         createCookie('time', countDownDate, 30);
         setTimeCookie(countDownDate);
@@ -387,14 +417,15 @@ function setTimer(countDownDate) {
     }
 
     timer = setInterval(function() {
-
-        // Get todays date and time
+        var continuous = false;
         var now = new Date().getTime();
-
-        // Find the distance between now an the count down date
         distance = countDownDate - now;
-
-        // Time calculations for days, hours, minutes and seconds
+        if (distance < 0 && config.continuous == true) {
+            continuous = true;
+        }
+        if (continuous) {
+            distance = now - countDownDate;
+        }
         var days = Math.floor(distance / (1000 * 60 * 60 * 24));
         var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
@@ -402,17 +433,9 @@ function setTimer(countDownDate) {
         if (seconds < 10) {
             seconds = "0" + seconds;
         }
-        // Display the result in the element with id="displayTimer"
-        if (hours > 0) {
-            $("#displayTimer").text(hours + ":" + minutes + ":" + seconds);
-        } else {
+        if (!continuous) {
             $("#displayTimer").text(minutes + ":" + seconds);
             if (distance <= config.secondsAlert * 1000 + 900) {
-                // var color = "#FF0000";
-                // if (seconds % 2 == 0) {
-                //     color = "#FF0000";
-                // }
-                //console.log(color);
                 $("body").css("background-color", config.bgColorAlert);
                 $("#displayTimer").css("color", config.fontColorAlert);
                 $("#pause").css("color", config.fontColorAlert);
@@ -421,17 +444,23 @@ function setTimer(countDownDate) {
                 $("#undoTime").css("color", config.fontColorAlert);
                 $("#invertColors").hide();
             }
+        } else {
+            setColorDefault();
+            $("#invertColors").show();
+            if (config.imgTimer == null) {
+                $("#displayTimer").css("fontSize", "28vw");
+            }
+            $("#displayTimer").text("+" + minutes + ":" + seconds);
         }
-
-
-        // If the count down is finished, write some text 
         if (distance < 0) {
-            clearInterval(timer);
-            $("#displayTimer").text("0:00");
-            countDownDate = null;
-            timer = null;
-            if (config.showMsgEnd) {
-                showFrontLayer();
+            if (config.continuous == false) {
+                clearInterval(timer);
+                $("#displayTimer").text("0:00");
+                countDownDate = null;
+                timer = null;
+                if (config.showMsgEnd) {
+                    showFrontLayer();
+                }
             }
         }
         if (isPaused) {
