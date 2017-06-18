@@ -24,36 +24,6 @@
 
     <link rel="stylesheet" type="text/css" media="all" href="css/jquery.minicolors.css">
     <script type="text/javascript" src="js/jquery.minicolors.min.js"></script>
-    <!-- Facebook Pixel Code -->
-    <script>
-        ! function(f, b, e, v, n, t, s) {
-            if (f.fbq) return;
-            n = f.fbq = function() {
-                n.callMethod ?
-                    n.callMethod.apply(n, arguments) : n.queue.push(arguments)
-            };
-            if (!f._fbq) f._fbq = n;
-            n.push = n;
-            n.loaded = !0;
-            n.version = '2.0';
-            n.queue = [];
-            t = b.createElement(e);
-            t.async = !0;
-            t.src = v;
-            s = b.getElementsByTagName(e)[0];
-            s.parentNode.insertBefore(t, s)
-        }(window,
-            document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
-        fbq('init', '310003469443824', {
-            em: 'insert_email_variable'
-        });
-        fbq('track', 'PageView');
-    </script>
-    <noscript><img height="1" width="1" style="display:none"
-src="https://www.facebook.com/tr?id=310003469443824&ev=PageView&noscript=1"
-/></noscript>
-    <!-- DO NOT MODIFY -->
-    <!-- End Facebook Pixel Code -->
     <script>
         (function(i, s, o, g, r, a, m) {
             i['GoogleAnalyticsObject'] = r;
@@ -89,15 +59,15 @@ src="https://www.facebook.com/tr?id=310003469443824&ev=PageView&noscript=1"
         
         #frontlayer {
             position: relative;
-            top: 20%;
+            top: 35%;
             right: 0;
             bottom: 0;
             left: 0;
             margin: auto;
-            padding: 30px;
-            width: 50%;
-            height: 40%;
-            font-size: 10vw;
+            padding: 0px;
+            width: 100%;
+            height: 100%;
+            font-size: 8vw;
             color: white;
             background-color: transparent;
             visibility: hidden;
@@ -107,30 +77,30 @@ src="https://www.facebook.com/tr?id=310003469443824&ev=PageView&noscript=1"
     </style>
 </head>
 
-<body scroll="no" style="overflow: hidden">
+<body scroll="no" style="overflow: hidden; margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; padding: 0;">
+    <div id="displayTimer" style="font-size:33vw; font-family:'Droid Sans Mono'; vertical-align: top" align="center"></div>
+    <div align='center' id='showImgTimer' style='vertical-align: top' aria-hidden="true">
+        <img src="" height="10%" id='imgTimer' style='vertical-align: top'><br><br><br>
+    </div>
+    <div align="center" id="controls" style='vertical-align: top; margin-top: 0%; padding-top: 0%'>
+        <a href="#" aria-label="Back" title="Back (esc)" style="color:#000000" id="resetTime"><i class="fa fa-arrow-left fa-lg">&nbsp;&nbsp;&nbsp;&nbsp;</i></a>
+        <a href="#" aria-label="Resume" title="Resume (spacebar)" style="color:#000000" id="play"><i class="fa fa-play fa-lg">&nbsp;&nbsp;&nbsp;&nbsp;</i></a>
+        <a href="#" aria-label="Pause" title="Pause (spacebar)" style="color:#000000" id="pause"><i class="fa fa-pause fa-lg">&nbsp;&nbsp;&nbsp;&nbsp;</i></a>
+        <a href="#" aria-label="Reset" title="Reset (R)" style="color:#000000" id="undoTime"><i class="fa fa-undo fa-lg">&nbsp;&nbsp;&nbsp;&nbsp;</i></a>
+        <a href="#" aria-label="Invert colors" title="Invert Colors (I)" style="color:#000000" id="invertColors"><i class="fa fa-adjust fa-lg" aria-hidden="true"></i></a>
+    </div>
     <div id="bg_mask" tabindex="-1">
         <div id="frontlayer" align='center'>Time's Up</div>
     </div>
-    <p id="displayTimer" style="font-size:30vw; font-family:'Droid Sans Mono'" align="center"></p>
-    <div align='center' id='showImgTimer' style='vertical-align: top' aria-hidden="true">
-        <img src="" height="10%" id='imgTimer'><br><br><br>
-    </div>
-    <div align="center" id="controls">
-        <a href="#" aria-label="Back" title="Back (esc)" style="color:#000000" id="resetTime"><i class="fa fa-arrow-left fa-2x">&nbsp;&nbsp;&nbsp;&nbsp;</i></a>
-        <a href="#" aria-label="Resume" title="Resume (spacebar)" style="color:#000000" id="play"><i class="fa fa-play fa-2x">&nbsp;&nbsp;&nbsp;&nbsp;</i></a>
-        <a href="#" aria-label="Pause" title="Pause (spacebar)" style="color:#000000" id="pause"><i class="fa fa-pause fa-2x">&nbsp;&nbsp;&nbsp;&nbsp;</i></a>
-        <a href="#" aria-label="Reset" title="Reset (R)" style="color:#000000" id="undoTime"><i class="fa fa-undo fa-2x">&nbsp;&nbsp;&nbsp;&nbsp;</i></a>
-        <a href="#" aria-label="Invert colors" title="Invert Colors (I)" style="color:#000000" id="invertColors"><i class="fa fa-adjust fa-2x" aria-hidden="true"></i></a>
-    </div>
     <div class="row">
-        <div class="col-1 col-sm-3 col-md-4">
+        <div class="col-1 col-sm-1 col-md-4">
         </div>
-        <div class="col-10 col-sm-6 col-md-4">
+        <div class="col-10 col-sm-10 col-md-4">
             <div align='center' id='welcomeCard' style='padding-top:3%'>
                 <div class="card" align='left'>
                     <img class="card-img-top" src="img/home.jpeg">
                     <div class="card-block ">
-                        <h4 class="card-title">Let's start</h4>
+                        <h4 class="card-title">Let's start </h4>
                         <p class="card-text">Set up how long will be the presentation and hit start!</p>
                         <div align='center'>
                             <select id="time" class="custom-select">
@@ -152,7 +122,7 @@ src="https://www.facebook.com/tr?id=310003469443824&ev=PageView&noscript=1"
                     </div>
                 </div>
             </div>
-            <div class="col-1 col-sm-3 col-md-4">
+            <div class="col-1 col-sm-1 col-md-4">
             </div>
         </div>
     </div>

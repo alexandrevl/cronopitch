@@ -309,11 +309,16 @@ function pauseTimer() {
     }
 }
 var isResumed = false;
+var continuous = false;
 
 function resumeTimer() {
     eraseCookie('timerPaused');
     clearInterval(blinkTimer);
-    countDownDate = new Date().getTime() + distance;
+    if (!continuous) {
+        countDownDate = new Date().getTime() + distance;
+    } else {
+        countDownDate = new Date().getTime() - distance;
+    }
     isResumed = true;
     isPaused = false;
     setTimeCookie(countDownDate);
@@ -341,7 +346,6 @@ function cookiesTimer() {
 }
 
 function prepareTimer(minutesLeft) {
-    $("#displayTimer").css("fontSize", "30vw");
     $("#invertColors").show();
     if (timer != null) {
         clearInterval(timer);
@@ -353,7 +357,7 @@ function prepareTimer(minutesLeft) {
         }
         //minutesLeft = 5/60;
         countDownDate = new Date().getTime() + (60000 * minutesLeft + 1000);
-        //countDownDate = new Date().getTime() + (5000);
+        //countDownDate = new Date().getTime() + (3000);
         createCookie('minutesLeft', minutesLeft, 30);
         createCookie('time', countDownDate, 30);
         setTimeCookie(countDownDate);
@@ -375,7 +379,7 @@ function resetTimer() {
     $("#displayTimer").fadeIn(1);
     setColorDefault();
     $("#showImgTimer").hide();
-    $("#displayTimer").css("fontSize", "30vw");
+    $("#displayTimer").css("fontSize", "33vw");
     $("body").css("background-color", '#FFFFFF');
     countDownDate = null;
     hideFrontLayer();
@@ -393,13 +397,14 @@ function setColorDefault() {
 }
 
 function setTimer(countDownDate) {
+    $("#displayTimer").css("fontSize", "33vw");
     setColorDefault();
     var invertedColors = parseInt(readCookie('invertedColors'));
     if (invertedColors == 1) {
         isInvertedColors = 0;
         invertColors();
     }
-    //console.log('Teste entrada');
+
     this.countDownDate = countDownDate;
     if (!isResumed) {
         $("#displayTimer").text(minutesLeft + ":00");
@@ -411,13 +416,12 @@ function setTimer(countDownDate) {
     $("#pause").show();
     $("#welcomeCard").hide();
     if (config.imgTimer != null) {
-        $("#displayTimer").css("fontSize", "25vw");
+        $("#displayTimer").css("fontSize", "28vw");
         $('#showImgTimer').show();
         $('#imgTimer').attr('src', config.imgTimer);
     }
 
     timer = setInterval(function() {
-        var continuous = false;
         var now = new Date().getTime();
         distance = countDownDate - now;
         if (distance < 0 && config.continuous == true) {
@@ -448,9 +452,9 @@ function setTimer(countDownDate) {
             setColorDefault();
             $("#invertColors").show();
             if (config.imgTimer == null) {
-                $("#displayTimer").css("fontSize", "28vw");
+                $("#displayTimer").css("fontSize", "33vw");
             }
-            $("#displayTimer").text("+" + minutes + ":" + seconds);
+            $("#displayTimer").html('<i class="fa fa-plus" aria-hidden="true" style="font-size: 8vw; vertical-align: middle;"></i>' + minutes + ":" + seconds);
         }
         if (distance < 0) {
             if (config.continuous == false) {
