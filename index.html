@@ -5,12 +5,13 @@
         Cronopitch - A timer for your pitch
     </title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="Cache-control" content="public">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta name=apple-mobile-web-app-capable content=yes>
     <meta name=apple-mobile-web-app-status-bar-style content=black>
     <meta name=description content="A timer for your pitch. Now you have an easy, totally free and fully customized chronometer to measure the time of your presentations or pitch sessions.">
-    <link rel="icon" href="cronopitch_logo.png">
-    <link rel="apple-touch-icon" sizes="114x114" href="cronopitch.png" />
+    <link rel="icon" href="img/cronopitch_icon.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="img/cronopitch114.png" />
     <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
 
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
@@ -108,7 +109,7 @@ src="https://www.facebook.com/tr?id=310003469443824&ev=PageView&noscript=1"
 
 <body scroll="no" style="overflow: hidden">
     <div id="bg_mask" tabindex="-1">
-        <div id="frontlayer" align='center'>Applause</div>
+        <div id="frontlayer" align='center'>Time's Up</div>
     </div>
     <p id="displayTimer" style="font-size:30vw; font-family:'Droid Sans Mono'" align="center"></p>
     <div align='center' id='showImgTimer' style='vertical-align: top' aria-hidden="true">
@@ -125,9 +126,9 @@ src="https://www.facebook.com/tr?id=310003469443824&ev=PageView&noscript=1"
         <div class="col-1 col-sm-3 col-md-4">
         </div>
         <div class="col-10 col-sm-6 col-md-4">
-            <div align='center' id='welcomeCard' style='padding-top:10%'>
+            <div align='center' id='welcomeCard' style='padding-top:3%'>
                 <div class="card" align='left'>
-                    <img class="card-img-top" src="cronopitch.jpeg">
+                    <img class="card-img-top" src="img/home.jpeg">
                     <div class="card-block ">
                         <h4 class="card-title">Let's start</h4>
                         <p class="card-text">Set up how long will be the presentation and hit start!</p>
@@ -140,6 +141,9 @@ src="https://www.facebook.com/tr?id=310003469443824&ev=PageView&noscript=1"
                         <option value="15">15 minutes</option>
                         <option value="20">20 minutes</option>
                         <option value="30">30 minutes</option>
+                        <option value="40">40 minutes</option>
+                        <option value="50">50 minutes</option>
+                        <option value="60">60 minutes</option>
                         <option value="-1">Custom</option>
                     </select> &nbsp;
                             <a id="setTime" class="btn btn-primary" aria-label="Start" title="Start (spacebar)" href="#start">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-play" id="play" style="color: #FFFFFF"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
