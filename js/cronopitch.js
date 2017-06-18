@@ -22,6 +22,54 @@ var config = null;
 var isShowAdvanced = false;
 
 $(function() {
+    // if (window.innerWidth < window.innerHeight) {
+    //     $(window).scrollTop(0);
+    //     if (timer != null) {
+    //         $("#displayTimer").hide();
+    //         $("#controls").hide();
+    //         $("#turnScreen").show();
+    //     } else {
+    //         $("#welcomeCard").hide();
+    //         $("#turnScreen").show();
+    //     }
+    // }
+    // window.addEventListener('orientationchange', function(event) {
+    //     if (window.innerWidth < window.innerHeight) {
+    //         $(window).scrollTop(0);
+    //         if (timer != null) {
+    //             $("#displayTimer").hide();
+    //             $("#controls").hide();
+    //             $("#turnScreen").show();
+    //         } else {
+    //             $("#welcomeCard").hide();
+    //             $("#turnScreen").show();
+    //         }
+    //     } else {
+    //         if (timer != null) {
+    //             $("#displayTimer").show();
+    //             $("#controls").show();
+    //             $("#turnScreen").hide();
+    //         } else {
+    //             $("#welcomeCard").show();
+    //             $("#turnScreen").hide();
+    //         }
+    //     }
+    // }, false);
+
+    $(document).bind('touchmove', function(e) {
+        e.preventDefault();
+    });
+    $("a").each(function() {
+        var href = $(this).attr("href");
+        var target = $(this).attr("target");
+        var text = $(this).text();
+        $(this).click(function(event) { // when someone clicks these links
+            event.preventDefault(); // don't open the link yet
+            setTimeout(function() { // now wait 300 milliseconds...
+                window.open(href, (!target ? "_self" : target)); // ...and open the link as usual
+            }, 300);
+        });
+    });
     config = JSON.parse(JSON.stringify(configDefault));
     var configCookie = readCookie('config');
     if (configCookie != null) {
@@ -379,7 +427,6 @@ function resetTimer() {
     $("#displayTimer").fadeIn(1);
     setColorDefault();
     $("#showImgTimer").hide();
-    $("#displayTimer").css("fontSize", "33vw");
     $("body").css("background-color", '#FFFFFF');
     countDownDate = null;
     hideFrontLayer();
@@ -416,7 +463,7 @@ function setTimer(countDownDate) {
     $("#pause").show();
     $("#welcomeCard").hide();
     if (config.imgTimer != null) {
-        $("#displayTimer").css("fontSize", "28vw");
+        $("#displayTimer").css("fontSize", "29vw");
         $('#showImgTimer').show();
         $('#imgTimer').attr('src', config.imgTimer);
     }
