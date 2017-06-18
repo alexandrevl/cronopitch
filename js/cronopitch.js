@@ -117,6 +117,7 @@ $(function() {
         createCookie('config', JSON.stringify(config), 30);
         isShowAdvanced = false;
         $('#config').modal('toggle');
+        $(window).scrollTop(0);
     });
     $("#closeAdvanced").click(function() {
         $("#fontColorDefault").val(config.fontColorDefault);
@@ -125,6 +126,7 @@ $(function() {
         $("#secondsAlert").val(config.secondsAlert);
         $('#config').modal('toggle');
         isShowAdvanced = false;
+        $(window).scrollTop(0);
     });
     $("#advanced").click(function() {
         isShowAdvanced = true;
@@ -354,6 +356,7 @@ function pauseTimer() {
         eraseCookie('time');
         $("#play").show();
         $("#pause").hide();
+        $(window).scrollTop(0);
     }
 }
 var isResumed = false;
@@ -373,6 +376,7 @@ function resumeTimer() {
     setTimer(countDownDate);
     $("#play").hide();
     $("#pause").show();
+    $(window).scrollTop(0);
 }
 
 function cookiesTimer() {
@@ -469,6 +473,7 @@ function setTimer(countDownDate) {
     }
 
     timer = setInterval(function() {
+        $(window).scrollTop(0);
         var now = new Date().getTime();
         distance = countDownDate - now;
         if (distance < 0 && config.continuous == true) {
