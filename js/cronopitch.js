@@ -59,17 +59,6 @@ $(function() {
     $(document).bind('touchmove', function(e) {
         e.preventDefault();
     });
-    $("a").each(function() {
-        var href = $(this).attr("href");
-        var target = $(this).attr("target");
-        var text = $(this).text();
-        $(this).click(function(event) { // when someone clicks these links
-            event.preventDefault(); // don't open the link yet
-            setTimeout(function() { // now wait 300 milliseconds...
-                window.open(href, (!target ? "_self" : target)); // ...and open the link as usual
-            }, 300);
-        });
-    });
     config = JSON.parse(JSON.stringify(configDefault));
     var configCookie = readCookie('config');
     if (configCookie != null) {
@@ -429,6 +418,7 @@ function resetTimer() {
     $("#welcomeCard").show();
     $("#displayTimer").text("");
     $("#displayTimer").fadeIn(1);
+    $("#displayTimer").html('');
     setColorDefault();
     $("#showImgTimer").hide();
     $("body").css("background-color", '#FFFFFF');
@@ -448,6 +438,7 @@ function setColorDefault() {
 }
 
 function setTimer(countDownDate) {
+    continuous = false;
     $("#displayTimer").css("fontSize", "33vw");
     setColorDefault();
     var invertedColors = parseInt(readCookie('invertedColors'));
@@ -481,6 +472,9 @@ function setTimer(countDownDate) {
         }
         if (continuous) {
             distance = now - countDownDate;
+            if (distance >= 6000000) {
+                resetTimer();
+            }
         }
         //var days = Math.floor(distance / (1000 * 60 * 60 * 24));
         var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
