@@ -472,8 +472,10 @@ function setTimer(countDownDate) {
         }
         if (continuous) {
             distance = now - countDownDate;
+            //console.log(distance);
             if (distance >= 6000000) {
                 resetTimer();
+                return;
             }
         }
         //var days = Math.floor(distance / (1000 * 60 * 60 * 24));
