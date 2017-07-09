@@ -21,6 +21,32 @@ var configDefault = {
 var config = null;
 var isShowAdvanced = false;
 
+function readDeviceOrientation() {
+    if (Math.abs(window.orientation) >= 0) {
+        if (Math.abs(window.orientation) === 90) {
+            // Landscape
+            if (timer != null) {
+                $("#displayTimer").show();
+                $("#controls").show();
+                $("#turnScreen").hide();
+            } else {
+                $("#welcomeCard").show();
+                $("#turnScreen").hide();
+            }
+        } else {
+            // Portrait
+            if (timer != null) {
+                $("#displayTimer").hide();
+                $("#controls").hide();
+                $("#turnScreen").show();
+            } else {
+                $("#welcomeCard").hide();
+                $("#turnScreen").show();
+            }
+        }
+    }
+}
+
 $(function() {
     // if (window.innerWidth < window.innerHeight) {
     //     $(window).scrollTop(0);
@@ -55,6 +81,30 @@ $(function() {
     //         }
     //     }
     // }, false);
+    //readDeviceOrientation();
+    //window.onorientationchange = readDeviceOrientation;
+    ratio = window.innerWidth / window.innerHeight;
+    if (ratio > 1.90) {
+        $('#controls').attr('style', 'position:fixed; bottom:2%; left: 50%;transform: translate(-50%, 0) ; opacity: 0.1');
+    } else {
+        $('#controls').attr('style', 'vertical-align: top; margin-top: 0%; padding-top: 0%; opacity: 0.1; text-align:center');
+    }
+    $(window).resize(function() {
+        ratio = window.innerWidth / window.innerHeight;
+        if ($('#controls').is(":visible")) {
+            if (ratio > 1.90) {
+                $('#controls').attr('style', 'position:fixed; bottom:2%; left: 50%;transform: translate(-50%, 0) ; opacity: 0.1');
+            } else {
+                $('#controls').attr('style', 'vertical-align: top; margin-top: 0%; padding-top: 0%; opacity: 0.1; text-align:center');
+            }
+        }
+    });
+
+    $("#controls").hover(function() {
+        $(this).css({ opacity: 1 });
+    }, function() {
+        $(this).css({ opacity: 0.1 });
+    });
 
     $(document).bind('touchmove', function(e) {
         e.preventDefault();
@@ -439,7 +489,7 @@ function setColorDefault() {
 
 function setTimer(countDownDate) {
     continuous = false;
-    $("#displayTimer").css("fontSize", "33vw");
+    $("#displayTimer").css("fontSize", "35vw");
     setColorDefault();
     var invertedColors = parseInt(readCookie('invertedColors'));
     if (invertedColors == 1) {
@@ -458,7 +508,7 @@ function setTimer(countDownDate) {
     $("#pause").show();
     $("#welcomeCard").hide();
     if (config.imgTimer != null) {
-        $("#displayTimer").css("fontSize", "29vw");
+        $("#displayTimer").css("fontSize", "31vw");
         $('#showImgTimer').show();
         $('#imgTimer').attr('src', config.imgTimer);
     }
@@ -500,7 +550,7 @@ function setTimer(countDownDate) {
             setColorDefault();
             $("#invertColors").show();
             if (config.imgTimer == null) {
-                $("#displayTimer").css("fontSize", "33vw");
+                $("#displayTimer").css("fontSize", "35vw");
             }
             $("#displayTimer").html('<i class="fa fa-plus" aria-hidden="true" style="font-size: 8vw; vertical-align: middle;"></i>' + minutes + ":" + seconds);
         }
