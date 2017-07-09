@@ -84,6 +84,7 @@ $(function() {
     //readDeviceOrientation();
     //window.onorientationchange = readDeviceOrientation;
     ratio = window.innerWidth / window.innerHeight;
+    console.log(ratio);
     if (ratio > 1.90) {
         $('#controls').attr('style', 'position:fixed; bottom:2%; left: 50%;transform: translate(-50%, 0) ; opacity: 0.1');
     } else {
@@ -103,7 +104,7 @@ $(function() {
     $("#controls").hover(function() {
         $(this).css({ opacity: 1 });
     }, function() {
-        $(this).css({ opacity: 0.1 });
+        $(this).css({ opacity: 0.2 });
     });
 
     $(document).bind('touchmove', function(e) {
@@ -508,7 +509,7 @@ function setTimer(countDownDate) {
     $("#pause").show();
     $("#welcomeCard").hide();
     if (config.imgTimer != null) {
-        $("#displayTimer").css("fontSize", "31vw");
+        $("#displayTimer").css("fontSize", "29vw");
         $('#showImgTimer').show();
         $('#imgTimer').attr('src', config.imgTimer);
     }
