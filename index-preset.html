@@ -16,12 +16,16 @@
     <link href="font-awesome-4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <script src="tether-1.3.3/dist/js/tether.min.js"></script>
     <script src="js/cronopitch.js" type="text/javascript"></script>
-    <script src="js/NoSleep.js" type="text/javascript"></script>
+    <script src="js/NoSleep.js"></script>
 
     <link rel="stylesheet" href="bootstrap-4.0.0-alpha.6-dist/css/bootstrap.min.css">
     <script src="bootstrap-4.0.0-alpha.6-dist/js/bootstrap.min.js"></script>
     <link rel="stylesheet" type="text/css" media="all" href="css/jquery.minicolors.css">
     <script type="text/javascript" src="js/jquery.minicolors.min.js"></script>
+    <script>
+        var noSleep = new NoSleep();
+        noSleep.enable();
+    </script>
     <script>
         (function(i, s, o, g, r, a, m) {
             i['GoogleAnalyticsObject'] = r;
@@ -37,8 +41,6 @@
 
         ga('create', 'UA-100391160-1', 'auto');
         ga('send', 'pageview');
-
-        noSleep.enable();
     </script>
     <style>
         @font-face {
@@ -88,7 +90,7 @@
         <div align='center' id='showImgTimer' style='vertical-align: top;margin: 0%; padding: 0%'>
             <img src="" height="10%" width="auto" id='imgTimer' style='vertical-align: top'><br><br><br>
         </div>
-        <div id="controls" style='position:fixed; bottom:2%; left: 50%;transform: translate(-50%, 0); opacity: 0.1'>
+        <div id="controls" style='position:fixed; bottom:2%; left: 50%;transform: translate(-50%, 0); opacity: 0.2'>
             <a href="#" aria-label="Back" title="Back (esc)" style="color:#000000" id="resetTime"><i class="fa fa-arrow-left fa-lg">&nbsp;&nbsp;&nbsp;&nbsp;</i></a>
             <a href="#" aria-label="Resume" title="Resume (spacebar)" style="color:#000000" id="play"><i class="fa fa-play fa-lg">&nbsp;&nbsp;&nbsp;&nbsp;</i></a>
             <a href="#" aria-label="Pause" title="Pause (spacebar)" style="color:#000000" id="pause"><i class="fa fa-pause fa-lg">&nbsp;&nbsp;&nbsp;&nbsp;</i></a>
@@ -115,25 +117,125 @@
                         <p class="card-text">Set up how long will be the presentation and hit start!</p>
                         <div align='center'>
                             <select id="time" class="custom-select">
-                            <option value="1">1 minute</option>
-                            <option value="3">3 minutes</option>
-                            <option value="5">5 minutes</option>
-                            <option value="10" selected>10 minutes</option>
-                            <option value="15">15 minutes</option>
-                            <option value="20">20 minutes</option>
-                            <option value="30">30 minutes</option>
-                            <option value="40">40 minutes</option>
-                            <option value="50">50 minutes</option>
-                            <option value="60">60 minutes</option>
-                            <option value="-1">Custom</option>
-                        </select> &nbsp;
+                        <option value="1">1 minute</option>
+                        <option value="3">3 minutes</option>
+                        <option value="5">5 minutes</option>
+                        <option value="10" selected>10 minutes</option>
+                        <option value="15">15 minutes</option>
+                        <option value="20">20 minutes</option>
+                        <option value="30">30 minutes</option>
+                        <option value="40">40 minutes</option>
+                        <option value="50">50 minutes</option>
+                        <option value="60">60 minutes</option>
+                        <option value="-1">Custom</option>
+                    </select> &nbsp;
                             <a id="setTime" class="btn btn-primary" aria-label="Start" title="Start (spacebar)" href="#start">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-play" id="play" style="color: #FFFFFF"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
                             <a class="btn btn-secondary" id="advanced" href="#" aria-label="Advanced Option" title="Advanced Options" data-toggle="modal" data-target="#config">&nbsp;<i class="fa fa-cog">&nbsp;</i></a>
                         </div>
                     </div>
                 </div>
+                <br>
+                <!--
+                <div class="card" align='left'>
+                    <div class="card-header">
+                        Presets
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <div class="col-2 col-sm-2 col-md-2">
+                                <a id="setTime" class="btn btn-primary" aria-label="Start" title="Start Preset" href="#start"><i class="fa fa-play" id="preset1" style="color: #FFFFFF"></i></a>
+                            </div>
+                            <div class="col-8 col-sm-8 col-md-8">
+                                <div class="font-weight: bold;">Inova.Junto</div>
+                            </div>
+                            <div class="col-2 col-sm-2 col-md-2">
+                                <a class="btn btn-secondary" id="preset1" href="#" aria-label="Edit preset" title="Edit Preset" data-toggle="modal" data-target="#configPreset"><i class="fa fa-cog"></i></a>
+                            </div>
+                        </li>
+                        <li class="list-group-item" style='text-align: right'>
+                            <a class="btn btn-default btn-sm" href="#" data-toggle="modal" data-target="#configPreset">
+                                <i class="fa fa-plus"></i> Add Preset</a>
+                        </li>
+                    </ul>
+                </div>
+            -->
             </div>
             <div class="col-1 col-sm-2 col-md-4">
+            </div>
+        </div>
+    </div>
+    <!-- Modal Preset -->
+    <div class="modal fade" id="configPreset" tabindex="-1" role="dialog" aria-labelledby="configPreset" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Advanced Options - Preset</h5>
+                    <button type="button" class="close" id='closePreset' aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="well">
+                            <div class="form-group" id='title'>
+                                <label for="tile">Title</label>
+                                <div class="input-group margin-bottom-sm">
+                                    <span class="input-group-addon"><i class="fa fa-align-justify"></i></span>
+                                    <input type="text" class="form-control" id="titleText" placeholder="Title" maxlength="17" value='Preset #1'>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="fontColorDefault">Font Color</label>
+                                <input type="text" class="form-control color" id="fontColorDefault" data-control="hue" value="#000000">
+                            </div>
+                            <div class=" form-group">
+                                <label for="bgColorDefault">Background Color</label>
+                                <input type="text" class="form-control color" id="bgColorDefault" data-control="hue" value="#ffffff">
+                            </div>
+                        </div>
+                        <div class="form-group" id='timeAltertGroup'>
+                            <label for="secondsAlert">Seconds of alert</label>
+                            <div class="input-group margin-bottom-sm">
+                                <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
+                                <input type="text" class="form-control" id="secondsAlert" placeholder="Alert Seconds" maxlength="3" value='10'>
+                            </div>
+                        </div>
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="checkbox" value="1" id='continuous'>
+                                Continuous timer (don't stop at the end)?
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="checkbox" value="1" id='showMsgEnd' checked>
+                                Show msg in the end?
+                            </label>
+                        </div>
+                        <div class="form-group" id='msgEndGroup'>
+                            <div class="input-group margin-bottom-sm">
+                                <span class="input-group-addon"><i class="fa fa-align-justify "></i></span>
+                                <input type="text" class="form-control" id="msgEnd" placeholder="Applause" maxlength="15" value='Applause'>
+                            </div>
+                        </div>
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="checkbox" value="1" id='showImage'>
+                                Show a logo?
+                            </label>
+                        </div>
+                        <div class="form-group" id='imgBox' style='display: none'>
+                            <div class="input-group margin-bottom-sm">
+                                <span class="input-group-addon"><i class="fa fa-picture-o"></i></span>
+                                <input type="url" class="form-control" id="imgSet" placeholder="http://url.image" maxlength="150">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer ">
+                    <a href="#" id='resetConfig'>Reset</a>
+                    <button type="button " class="btn btn-primary " id='saveAdvanced'>Save</button>
+                </div>
             </div>
         </div>
     </div>
@@ -145,8 +247,8 @@
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Advanced Options</h5>
                     <button type="button" class="close" id='closeAdvanced' aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
+          <span aria-hidden="true">&times;</span>
+        </button>
                 </div>
                 <div class="modal-body">
                     <form>
@@ -169,15 +271,15 @@
                         </div>
                         <div class="form-check">
                             <label class="form-check-label">
-                                    <input class="form-check-input" type="checkbox" value="1" id='continuous'>
-                                    Continuous timer (don't stop at the end)?
-                                </label>
+                                <input class="form-check-input" type="checkbox" value="1" id='continuous'>
+                                Continuous timer (don't stop at the end)?
+                            </label>
                         </div>
                         <div class="form-check">
                             <label class="form-check-label">
-                                    <input class="form-check-input" type="checkbox" value="1" id='showMsgEnd' checked>
-                                    Show msg in the end?
-                                </label>
+                                <input class="form-check-input" type="checkbox" value="1" id='showMsgEnd' checked>
+                                Show msg in the end?
+                            </label>
                         </div>
                         <div class="form-group" id='msgEndGroup'>
                             <div class="input-group margin-bottom-sm">
@@ -187,9 +289,9 @@
                         </div>
                         <div class="form-check">
                             <label class="form-check-label">
-                                    <input class="form-check-input" type="checkbox" value="1" id='showImage'>
-                                    Show a logo?
-                                </label>
+                                <input class="form-check-input" type="checkbox" value="1" id='showImage'>
+                                Show a logo?
+                            </label>
                         </div>
                         <div class="form-group" id='imgBox' style='display: none'>
                             <div class="input-group margin-bottom-sm">
@@ -207,15 +309,15 @@
         </div>
     </div>
 
-    <!-- Modal Custom -->
+    <!-- Modal Custom 
     <div class="modal fade" id="custom" tabindex="-1" role="dialog" aria-labelledby="customModal" aria-hidden="true">
         <div class="modal-dialog modal-sm" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Set your timer</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-            </button>
+                    <span aria-hidden="true">&times;</span>
+        </button>
                 </div>
                 <div class="modal-body">
                     <form>
@@ -232,6 +334,7 @@
             </div>
         </div>
     </div>
+-->
 </body>
 
 </html>

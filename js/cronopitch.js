@@ -4,6 +4,7 @@ var minutesLeft = 0;
 var isPaused = false;
 
 var configDefault = {
+    'title': 'Default',
     'fontColorInverted': '#FFFFFF',
     'bgColorInverted': '#000000',
     'fontColorDefault': '#000000',
@@ -16,7 +17,8 @@ var configDefault = {
     'msgEnd': "Time's up",
     //'imgTimer': 'https://www.labbs.com.br/wp-content/uploads/2017/05/Ativo-1.png'
     //'imgTimer': 'http://static1.squarespace.com/static/5747177ee321402733fd16cd/t/57477e5f07eaa01bd1a504ac/1496683053127'
-    'imgTimer': null
+    'imgTimer': null,
+    'presets': []
 }
 var config = null;
 var isShowAdvanced = false;
@@ -302,19 +304,23 @@ $(function() {
     $(window).keydown(function(e) {
         switch (e.keyCode) {
             case 73:
+                e.preventDefault();
                 if (countDownDate != null) {
                     invertColors();
                 }
                 return;
             case 82:
+                e.preventDefault();
                 if (countDownDate != null) {
                     prepareTimer(0);
                 }
                 return;
             case 27:
+                e.preventDefault();
                 resetTimer();
                 return;
             case 32:
+                e.preventDefault();
                 if (!isShowAdvanced) {
                     if (countDownDate == null) {
                         prepareTimer(0);
