@@ -561,7 +561,7 @@ function setTimer(countDownDate) {
             }
             $("#displayTimer").html('<i class="fa fa-plus" aria-hidden="true" style="font-size: 8vw; vertical-align: middle;"></i>' + minutes + ":" + seconds);
         }
-        if (distance < 0) {
+        if (distance <= 0) {
             if (config.continuous == false) {
                 clearInterval(timer);
                 $("#displayTimer").text("0:00");
@@ -598,6 +598,7 @@ function readCookie(name) {
         if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
     }
     return null;
+
 }
 
 function eraseCookie(name) {
@@ -611,8 +612,8 @@ function setTimeCookie(countDownDate) {
 function showFrontLayer() {
     //animateRotate(-20);
     $("#frontlayer").text(config.msgEnd);
-    $("#bg_mask").css({ visibility: "visible", opacity: 0.0 }).animate({ opacity: 1.0 }, 1000);
-    $("#frontlayer").css({ visibility: "visible", opacity: 0.0 }).animate({ opacity: 1.0 }, 1000);
+    $("#bg_mask").css({ visibility: "visible", opacity: 0.0 }).animate({ opacity: 1.0 }, 100);
+    $("#frontlayer").css({ visibility: "visible", opacity: 0.0 }).animate({ opacity: 1.0 }, 100);
 }
 
 function hideFrontLayer() {
