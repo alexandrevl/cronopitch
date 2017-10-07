@@ -244,7 +244,22 @@ $(function() {
             $('#custom').modal('toggle');
         }
     });
+    $("#customMinutes").keyup(function() {
+        var minutes = parseInt($(this).val());
+        //console.log(minutes);
+        if (minutes != 0) {
+            if ($(this).val().length == 0) {
+                $("#saveCustom").attr("disabled", true);
+            } else {
+                $("#saveCustom").removeAttr("disabled");
+            }
+        }
+    });
+    $('#custom').on('shown.bs.modal', function() {
+        $('#customMinutes').focus();
+    })
     $("#saveCustom").click(function() {
+        resetTimer();
         var minutes = parseInt($("#customMinutes").val());
         switch (minutes) {
             case 1:
@@ -261,6 +276,7 @@ $(function() {
         }
         $('#time').val(minutes);
         $('#custom').modal('toggle');
+        prepareTimer(0);
     });
     $("#closeCustom").click(function() {
         $('#time').val("10");
@@ -303,6 +319,51 @@ $(function() {
     cookiesTimer();
     $(window).keydown(function(e) {
         switch (e.keyCode) {
+            case 48:
+            case 49:
+            case 50:
+            case 51:
+            case 52:
+            case 53:
+            case 54:
+            case 55:
+            case 56:
+            case 57:
+                if (!$('#custom').is(':visible')) {
+                    $('#custom').modal('toggle');
+                    $("#customMinutes").val(String.fromCharCode(e.keyCode));
+                    $("#customMinutes").focus();
+                    if ($("#customMinutes").val().length == 0) {
+                        $("#saveCustom").attr("disabled", true);
+                    } else {
+                        $("#saveCustom").removeAttr("disabled");
+                    }
+
+                    //console.log(e.keyCode);
+                }
+                return;
+            case 13:
+                if ($('#custom').is(':visible')) {
+                    resetTimer();
+                    var minutes = parseInt($("#customMinutes").val());
+                    switch (minutes) {
+                        case 1:
+                        case 3:
+                        case 5:
+                        case 10:
+                        case 15:
+                        case 20:
+                        case 30:
+                            break;
+                        default:
+                            $("#time").append(new Option($("#customMinutes").val() + ' minutes', minutes));
+                            break;
+                    }
+                    $('#time').val(minutes);
+                    $('#custom').modal('toggle');
+                    prepareTimer(0);
+                }
+                return;
             case 73:
                 e.preventDefault();
                 if (countDownDate != null) {
@@ -317,11 +378,13 @@ $(function() {
                 return;
             case 27:
                 e.preventDefault();
-                resetTimer();
+                if (!$('#custom').is(':visible')) {
+                    resetTimer();
+                }
                 return;
             case 32:
                 e.preventDefault();
-                if (!isShowAdvanced) {
+                if (!isShowAdvanced && (!$('#custom').is(':visible'))) {
                     if (countDownDate == null) {
                         prepareTimer(0);
                     } else {
@@ -444,6 +507,7 @@ function cookiesTimer() {
 }
 
 function prepareTimer(minutesLeft) {
+    resetTimer();
     $("#invertColors").show();
     if (timer != null) {
         clearInterval(timer);
