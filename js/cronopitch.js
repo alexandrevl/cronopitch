@@ -2,7 +2,10 @@ var timer = null;
 var countDownDate = null;
 var minutesLeft = 0;
 var isPaused = false;
+var isWriteFB = true;
 
+var idFirebase = Math.floor(Math.random() * (999999 - 0) + 0);
+var idClient = Math.floor(Math.random() * (999999999 - 0) + 0);
 var configDefault = {
     'title': 'Default',
     'fontColorInverted': '#FFFFFF',
@@ -18,10 +21,32 @@ var configDefault = {
     //'imgTimer': 'https://www.labbs.com.br/wp-content/uploads/2017/05/Ativo-1.png'
     //'imgTimer': 'http://static1.squarespace.com/static/5747177ee321402733fd16cd/t/57477e5f07eaa01bd1a504ac/1496683053127'
     'imgTimer': null,
+    'idFirebase': idFirebase,
+    'idClient': idClient,
     'presets': []
 }
+var playConfigDefault = {
+    invertedColors: false,
+    minutesLeft: 10,
+    time: 0,
+    timerPaused: false,
+    timerPausedTime: 0
+}
+var playConfig = null;
 var config = null;
 var isShowAdvanced = false;
+
+// Initialize Firebase
+var configFirebase = {
+    apiKey: "AIzaSyDKB9w_qIKETeT1Igv3pIAUTSZfq3axo4U",
+    authDomain: "punisher-2eafa.firebaseapp.com",
+    databaseURL: "https://punisher-2eafa.firebaseio.com",
+    projectId: "punisher-2eafa",
+    storageBucket: "punisher-2eafa.appspot.com",
+    messagingSenderId: "693554201973"
+};
+firebase.initializeApp(configFirebase);
+var database = firebase.database();
 
 function readDeviceOrientation() {
     if (Math.abs(window.orientation) >= 0) {
@@ -47,6 +72,15 @@ function readDeviceOrientation() {
             }
         }
     }
+}
+
+function getUrlVars() {
+    var vars = {};
+    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi,
+        function(m, key, value) {
+            vars[key] = value.replace('#', '');
+        });
+    return vars;
 }
 
 $(function() {
@@ -86,7 +120,7 @@ $(function() {
     //readDeviceOrientation();
     //window.onorientationchange = readDeviceOrientation;
     ratio = window.innerWidth / window.innerHeight;
-    console.log(ratio);
+    //console.log(ratio);
     if (ratio > 1.90) {
         $('#controls').attr('style', 'position:fixed; bottom:2%; left: 50%;transform: translate(-50%, 0) ; opacity: 0.1');
     } else {
@@ -102,6 +136,7 @@ $(function() {
             }
         }
     });
+    $("#ocrAlert").hide();
 
     $("#controls").hover(function() {
         $(this).css({ opacity: 1 });
@@ -112,11 +147,105 @@ $(function() {
     $(document).bind('touchmove', function(e) {
         e.preventDefault();
     });
+
+    var isRefresh = null;
+    var idFirebaseRemote = getUrlVars()["id"];
+    isRefresh = getUrlVars()["refresh"];
+    //console.log(idFirebaseRemote);
+
+    playConfig = playConfigDefault;
+    var playConfigCookie = readCookie('playConfig');
+    if (playConfigCookie != null) {
+        try {
+            playConfig = JSON.parse(playConfigCookie);
+        } catch (error) {
+            createCookie('playConfig', JSON.stringify(playConfig), 30);
+        }
+    }
+
     config = JSON.parse(JSON.stringify(configDefault));
     var configCookie = readCookie('config');
     if (configCookie != null) {
         config = JSON.parse(configCookie);
+        if (config.idFirebase != "" && config.idFirebase != 0 && config.idFirebase != null && config.idFirebase != undefined) {
+            idFirebase = config.idFirebase;
+        }
+        //idClient = config.idClient;
     }
+    if (idFirebaseRemote != null && idFirebaseRemote != "" && idFirebaseRemote != 0 && idFirebaseRemote != undefined) {
+        config.idFirebase = idFirebaseRemote;
+        configDefault.idFirebase = idFirebaseRemote;
+        idFirebase = config.idFirebase;
+        console.log(isRefresh);
+        if (isRefresh == undefined) {
+            $("#ocrAlert").text("Connected to: " + idFirebase);
+            $("#ocrAlert").show();
+        }
+        //console.log(config);
+    }
+    var refFirebase = database.ref('cronopitch/' + idFirebase);
+    refFirebase.on('value', (data) => {
+        $("#idFirebase").html('' + idFirebase);
+        qrcode.makeCode("https://cronopitch.com/?id=" + idFirebase);
+        var lastIdClient = data.val().idClient;
+        //console.log(idClient, lastIdClient);
+        if (lastIdClient != idClient) {
+            isWriteFB = false;
+            config = data.val().config;
+            resetTimer();
+            createCookie('config', JSON.stringify(config), 30);
+            playConfig = data.val().playConfig;
+            //console.log(data.val());
+            createCookie('playConfig', JSON.stringify(playConfig), 30);
+            var isCookieTimer = true;
+            //console.log('Atualiza... ', data.val());
+
+            // if (data.val().timerPausedTime != undefined) {
+            //     createCookie('timerPausedTime', data.val().timerPausedTime, 30);
+            //     isCookieTimer = true;
+            // } else {
+            //     createCookie('timerPausedTime', null, 30);
+            // }
+            // if (data.val().timerPaused != undefined) {
+            //     createCookie('timerPaused', data.val().timerPaused, 30);
+            //     isCookieTimer = true;
+            // } else {
+            //     createCookie('timerPaused', false, 30);
+            // }
+            // if (data.val().invertedColors != undefined) {
+            //     createCookie('invertedColors', data.val().invertedColors, 30);
+            // } else {
+            //     createCookie('invertedColors', "", 30);
+            // }
+            // if (data.val().minutesLeft != undefined) {
+            //     createCookie('minutesLeft', data.val().minutesLeft, 30);
+            // } else {
+            //     createCookie('minutesLeft', 0, 30);
+            // }
+            // //console.log(data.val().time);
+            // if (data.val().time != undefined) {
+            //     createCookie('time', data.val().time, 30);
+            //     isCookieTimer = true;
+            // } else {
+            //     createCookie('time', null, 30);
+            // }
+            if (isCookieTimer) {
+                var isTicking = cookiesTimer().then(
+                    isWriteFB = true
+                );
+                //console.log("isTicking ", isTicking);
+            } else {
+                isWriteFB = true;
+            }
+        }
+    });
+    createCookie('config', JSON.stringify(config), 30);
+    createCookie('playConfig', JSON.stringify(playConfig), 30);
+    //var refConfig = database.ref('cronopitch/' + idFirebase + '/config');
+    //refConfig.set(config);
+
+
+
     $("#fontColorDefault").val(config.fontColorDefault);
     $("#bgColorDefault").val(config.bgColorDefault);
     $("#msgEnd").val(config.msgEnd);
@@ -155,7 +284,6 @@ $(function() {
         } else {
             config.secondsAlert = null;
         }
-        eraseCookie('config');
         createCookie('config', JSON.stringify(config), 30);
         isShowAdvanced = false;
         $('#config').modal('toggle');
@@ -204,7 +332,7 @@ $(function() {
     });
     $("#resetConfig").click(function() {
         config = JSON.parse(JSON.stringify(configDefault));
-        eraseCookie('config');
+        config.idFirebase = idFirebase;
         createCookie('config', JSON.stringify(config), 30);
         $('#config').modal('toggle');
     });
@@ -229,6 +357,15 @@ $(function() {
                 $("#msgEndGroup").hide();
             }
         }
+    });
+    $("#connectOCR").click(function() {
+        var value = $("#ocrCode").val();
+        if (value.length > 0) {
+            window.open("https://cronopitch.com/?id=" + $("#ocrCode").val(), "_self");
+        }
+    });
+    $("#refreshCode").click(function() {
+        window.open("https://cronopitch.com/?id=" + Math.floor(Math.random() * (999999 - 0) + 0) + '&refresh=1', "_self");
     });
     $("#showMsgEnd").click(function() {
         if ($("#showMsgEnd").is(':checked')) {
@@ -257,7 +394,7 @@ $(function() {
     });
     $('#custom').on('shown.bs.modal', function() {
         $('#customMinutes').focus();
-    })
+    });
     $("#saveCustom").click(function() {
         resetTimer();
         var minutes = parseInt($("#customMinutes").val());
@@ -282,8 +419,9 @@ $(function() {
         $('#time').val("10");
         $('#custom').modal('toggle');
     });
+
     $("#undoTime").click(function() {
-        var minutesLeft = readCookie('minutesLeft');
+        var minutesLeft = playConfig.minutesLeft;
         if (minutesLeft != null) {
             resetTimer();
             prepareTimer(minutesLeft);
@@ -329,17 +467,19 @@ $(function() {
             case 55:
             case 56:
             case 57:
-                if (!$('#custom').is(':visible')) {
-                    $('#custom').modal('toggle');
-                    $("#customMinutes").val(String.fromCharCode(e.keyCode));
-                    $("#customMinutes").focus();
-                    if ($("#customMinutes").val().length == 0) {
-                        $("#saveCustom").attr("disabled", true);
-                    } else {
-                        $("#saveCustom").removeAttr("disabled");
-                    }
+                if (!isShowAdvanced && !$("#ocrCode").is(":focus")) {
+                    if (!$('#custom').is(':visible')) {
+                        $('#custom').modal('toggle');
+                        $("#customMinutes").val(String.fromCharCode(e.keyCode));
+                        $("#customMinutes").focus();
+                        if ($("#customMinutes").val().length == 0) {
+                            $("#saveCustom").attr("disabled", true);
+                        } else {
+                            $("#saveCustom").removeAttr("disabled");
+                        }
 
-                    //console.log(e.keyCode);
+                        //console.log(e.keyCode);
+                    }
                 }
                 return;
             case 13:
@@ -447,22 +587,26 @@ function invertColors() {
         setColorDefault();
         isInvertedColors = 0;
     }
-    eraseCookie('invertedColors');
-    createCookie('invertedColors', isInvertedColors, 30);
+    playConfig.invertedColors = isInvertedColors;
+    createCookie('playConfig', JSON.stringify(playConfig), 30);
 }
 
 function pauseTimer() {
     if (timer != null) {
+        var now = new Date().getTime();
+        console.log(countDownDate);
+        distance = countDownDate - now;
         clearInterval(timer);
         timer = null;
+        showTimer();
         blinkTimer = setInterval(function() {
             $("#displayTimer").fadeOut(500, function() {
                 $(this).fadeIn(500);
             });
         }, 500);
-        createCookie('timerPaused', true, 30);
-        createCookie('timerPausedTime', distance, 30);
-        eraseCookie('time');
+        playConfig.timerPaused = true;
+        playConfig.timerPausedTime = distance;
+        createCookie('playConfig', JSON.stringify(playConfig), 30);
         $("#play").show();
         $("#pause").hide();
         $(window).scrollTop(0);
@@ -472,7 +616,6 @@ var isResumed = false;
 var continuous = false;
 
 function resumeTimer() {
-    eraseCookie('timerPaused');
     clearInterval(blinkTimer);
     if (!continuous) {
         countDownDate = new Date().getTime() + distance;
@@ -481,7 +624,9 @@ function resumeTimer() {
     }
     isResumed = true;
     isPaused = false;
-    setTimeCookie(countDownDate);
+    playConfig.timerPaused = false;
+    playConfig.time = countDownDate;
+    createCookie('playConfig', JSON.stringify(playConfig), 30);
     setTimer(countDownDate);
     $("#play").hide();
     $("#pause").show();
@@ -489,21 +634,34 @@ function resumeTimer() {
 }
 
 function cookiesTimer() {
-    countDownDateCookie = readCookie('time');
-    if (countDownDateCookie != null) {
-        var now = new Date();
-        if (countDownDateCookie > now.getTime() || config.continuous) {
-            countDownDate = countDownDateCookie;
-            setTimer(countDownDateCookie);
+    return new Promise((resolve, reject) => {
+        //console.log(playConfig.time);
+        if (isShowAdvanced) {
+            $('#config').modal('toggle');
         }
-        isPaused = readCookie('timerPaused');
+        countDownDateCookie = playConfig.time;
+        countDownDate = countDownDateCookie;
+        isPaused = playConfig.timerPaused;
+        //console.log("isPaused ", isPaused);
         if (isPaused) {
-            var timerPausedTimer = readCookie('timerPausedTime');
-            setTimer(new Date().getTime() + parseInt(timerPausedTimer));
+            var timerPausedTimer = playConfig.timerPausedTime;
+            console.log(timerPausedTimer);
+            countDownDate = new Date().getTime() + parseInt(timerPausedTimer);
+            setTimer(countDownDate)
+                .then(
+                    pauseTimer()
+                );
+            return true;
+        } else if (countDownDateCookie != null && countDownDateCookie != "") {
+            var now = new Date();
+            if (countDownDateCookie > now.getTime() || config.continuous) {
+                countDownDate = countDownDateCookie;
+                setTimer(countDownDate);
+            }
+            return true;
         }
-        return true;
-    }
-    return false;
+        return false;
+    });
 }
 
 function prepareTimer(minutesLeft) {
@@ -520,9 +678,9 @@ function prepareTimer(minutesLeft) {
         //minutesLeft = 5/60;
         countDownDate = new Date().getTime() + (60000 * minutesLeft + 1000);
         //countDownDate = new Date().getTime() + (3000);
-        createCookie('minutesLeft', minutesLeft, 30);
-        createCookie('time', countDownDate, 30);
-        setTimeCookie(countDownDate);
+        playConfig.minutesLeft = minutesLeft;
+        playConfig.time = countDownDate;
+        createCookie('playConfig', JSON.stringify(playConfig), 30);
         setTimer(countDownDate);
     }
 }
@@ -531,9 +689,11 @@ function resetTimer() {
     clearInterval(timer);
     clearInterval(blinkTimer);
     timer = null;
-    eraseCookie('time');
-    eraseCookie('timerPaused');
-    eraseCookie('invertedColors');
+    playConfig.time = 0;
+    playConfig.timerPaused = false;
+    playConfig.timerPausedTime = 0;
+    playConfig.invertedColors = false;
+    createCookie('playConfig', JSON.stringify(playConfig), 30);
     $("#invertColors").show();
     $("#controls").hide();
     $("#welcomeCard").show();
@@ -559,87 +719,93 @@ function setColorDefault() {
 }
 
 function setTimer(countDownDate) {
-    continuous = false;
-    $("#displayTimer").css("fontSize", "35vw");
-    setColorDefault();
-    var invertedColors = parseInt(readCookie('invertedColors'));
-    if (invertedColors == 1) {
-        isInvertedColors = 0;
-        invertColors();
-    }
+    return new Promise((resolve, reject) => {
+        continuous = false;
+        $("#displayTimer").css("fontSize", "35vw");
+        setColorDefault();
+        var invertedColors = parseInt(playConfig.invertedColors);
+        if (invertedColors == 1) {
+            isInvertedColors = 0;
+            invertColors();
+        }
 
-    this.countDownDate = countDownDate;
-    if (!isResumed) {
-        $("#displayTimer").text(minutesLeft + ":00");
-    } else {
-        isResumed = false;
-    }
-    $("#controls").show();
-    $("#play").hide();
-    $("#pause").show();
-    $("#welcomeCard").hide();
-    if (config.imgTimer != null) {
-        $("#displayTimer").css("fontSize", "29vw");
-        $('#showImgTimer').show();
-        $('#imgTimer').attr('src', config.imgTimer);
-    }
-
-    timer = setInterval(function() {
-        $(window).scrollTop(0);
-        var now = new Date().getTime();
-        distance = countDownDate - now;
-        if (distance < 0 && config.continuous == true) {
-            continuous = true;
-        }
-        if (continuous) {
-            distance = now - countDownDate;
-            //console.log(distance);
-            if (distance >= 6000000) {
-                resetTimer();
-                return;
-            }
-        }
-        //var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        var minutes = hours * 60 + Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-        if (seconds < 10) {
-            seconds = "0" + seconds;
-        }
-        if (!continuous) {
-            $("#displayTimer").text(minutes + ":" + seconds);
-            if (distance <= config.secondsAlert * 1000 + 900) {
-                $("body").css("background-color", config.bgColorAlert);
-                $("#displayTimer").css("color", config.fontColorAlert);
-                $("#pause").css("color", config.fontColorAlert);
-                $("#play").css("color", config.fontColorAlert);
-                $("#resetTime").css("color", config.fontColorAlert);
-                $("#undoTime").css("color", config.fontColorAlert);
-                $("#invertColors").hide();
-            }
+        this.countDownDate = countDownDate;
+        if (!isResumed) {
+            $("#displayTimer").text(minutesLeft + ":00");
         } else {
-            setColorDefault();
-            $("#invertColors").show();
-            if (config.imgTimer == null) {
-                $("#displayTimer").css("fontSize", "35vw");
+            isResumed = false;
+        }
+        $("#controls").show();
+        $("#play").hide();
+        $("#pause").show();
+        $("#welcomeCard").hide();
+        if (config.imgTimer != null) {
+            $("#displayTimer").css("fontSize", "29vw");
+            $('#showImgTimer').show();
+            $('#imgTimer').attr('src', config.imgTimer);
+        }
+
+        timer = setInterval(function() {
+            showTimer();
+            // if (isPaused) {
+            //     pauseTimer();
+            // }
+        }, 100);
+    });
+}
+
+function showTimer() {
+    $(window).scrollTop(0);
+    var now = new Date().getTime();
+    distance = countDownDate - now;
+    if (distance < 0 && config.continuous == true) {
+        continuous = true;
+    }
+    if (continuous) {
+        distance = now - countDownDate;
+        //console.log(distance);
+        if (distance >= 6000000) {
+            resetTimer();
+            return;
+        }
+    }
+    //var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    var minutes = hours * 60 + Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+    if (seconds < 10) {
+        seconds = "0" + seconds;
+    }
+    if (!continuous) {
+        $("#displayTimer").text(minutes + ":" + seconds);
+        if (distance <= config.secondsAlert * 1000 + 900) {
+            $("body").css("background-color", config.bgColorAlert);
+            $("#displayTimer").css("color", config.fontColorAlert);
+            $("#pause").css("color", config.fontColorAlert);
+            $("#play").css("color", config.fontColorAlert);
+            $("#resetTime").css("color", config.fontColorAlert);
+            $("#undoTime").css("color", config.fontColorAlert);
+            $("#invertColors").hide();
+        }
+    } else {
+        setColorDefault();
+        $("#invertColors").show();
+        if (config.imgTimer == null) {
+            $("#displayTimer").css("fontSize", "35vw");
+        }
+        $("#displayTimer").html('<i class="fa fa-plus" aria-hidden="true" style="font-size: 8vw; vertical-align: middle;"></i>' + minutes + ":" + seconds);
+    }
+    if (distance <= 0) {
+        if (config.continuous == false) {
+            clearInterval(timer);
+            $("#displayTimer").text("0:00");
+            countDownDate = null;
+            timer = null;
+            if (config.showMsgEnd) {
+                showFrontLayer();
             }
-            $("#displayTimer").html('<i class="fa fa-plus" aria-hidden="true" style="font-size: 8vw; vertical-align: middle;"></i>' + minutes + ":" + seconds);
         }
-        if (distance <= 0) {
-            if (config.continuous == false) {
-                clearInterval(timer);
-                $("#displayTimer").text("0:00");
-                countDownDate = null;
-                timer = null;
-                if (config.showMsgEnd) {
-                    showFrontLayer();
-                }
-            }
-        }
-        if (isPaused) {
-            pauseTimer();
-        }
-    }, 100);
+    }
 }
 
 function createCookie(name, value, days) {
@@ -650,7 +816,23 @@ function createCookie(name, value, days) {
         expires = "; expires=" + date.toUTCString();
     }
     document.cookie = name + "=" + value + expires + "; path=/";
-    //console.log(name + "=" + value + expires + "; path=/");
+    //console.log(isWriteFB, name + "=" + value + expires + "; path=/");
+    if (isWriteFB) {
+        //console.log(isWriteFB, name + "=" + value + expires + "; path=/");
+        var refTimer = database.ref('cronopitch/' + idFirebase + '/' + name);
+        try {
+            value = JSON.parse(value)
+        } catch (error) {
+
+        }
+        refTimer.set(value);
+        refTimer = database.ref('cronopitch/' + idFirebase + '/idClient');
+        refTimer.set(idClient);
+    }
+    //isWriteFB = true;
+    // if (name == "config") {
+    //console.log(isWriteFB, name + "=" + value + expires + "; path=/");
+    // }
 }
 
 function readCookie(name) {
@@ -666,11 +848,9 @@ function readCookie(name) {
 }
 
 function eraseCookie(name) {
+    // var refTimer = database.ref('cronopitch/' + idFirebase + '/' + name);
+    // refTimer.set("");
     createCookie(name, "", -1);
-}
-
-function setTimeCookie(countDownDate) {
-    createCookie('time', countDownDate, 30);
 }
 
 function showFrontLayer() {
