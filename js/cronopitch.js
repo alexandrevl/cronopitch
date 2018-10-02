@@ -6,6 +6,7 @@ var isWriteFB = true;
 
 var idFirebase = Math.floor(Math.random() * (999999 - 0) + 0);
 var idClient = Math.floor(Math.random() * (999999999 - 0) + 0);
+var distance = 0;
 var configDefault = {
     'title': 'Default',
     'fontColorInverted': '#FFFFFF',
@@ -35,6 +36,8 @@ var playConfigDefault = {
 var playConfig = null;
 var config = null;
 var isShowAdvanced = false;
+
+var dateDiffFb = 0;
 
 // Initialize Firebase
 var configFirebase = {
@@ -176,15 +179,24 @@ $(function() {
         config.idFirebase = idFirebaseRemote;
         configDefault.idFirebase = idFirebaseRemote;
         idFirebase = config.idFirebase;
-        console.log(isRefresh);
+        //console.log(isRefresh);
         if (isRefresh == undefined) {
             $("#ocrAlert").text("Connected to: " + idFirebase);
             $("#ocrAlert").show();
         }
         //console.log(config);
+    } else {
+        createCookie('config', JSON.stringify(config), 30);
+        createCookie('playConfig', JSON.stringify(playConfig), 30);
     }
     var refFirebase = database.ref('cronopitch/' + idFirebase);
     refFirebase.on('value', (data) => {
+        database.ref("/.info/serverTimeOffset").on('value', function(offset) {
+            var offsetVal = offset.val() || 0;
+            var serverTime = Date.now() + offsetVal;
+            dateDiffFb = serverTime - (Date.now());
+            //console.log(serverTime, dateDiffFb, Date.now(), (Date.now()));
+        });
         $("#idFirebase").html('' + idFirebase);
         qrcode.makeCode("https://cronopitch.com/?id=" + idFirebase);
         var lastIdClient = data.val().idClient;
@@ -198,37 +210,6 @@ $(function() {
             //console.log(data.val());
             createCookie('playConfig', JSON.stringify(playConfig), 30);
             var isCookieTimer = true;
-            //console.log('Atualiza... ', data.val());
-
-            // if (data.val().timerPausedTime != undefined) {
-            //     createCookie('timerPausedTime', data.val().timerPausedTime, 30);
-            //     isCookieTimer = true;
-            // } else {
-            //     createCookie('timerPausedTime', null, 30);
-            // }
-            // if (data.val().timerPaused != undefined) {
-            //     createCookie('timerPaused', data.val().timerPaused, 30);
-            //     isCookieTimer = true;
-            // } else {
-            //     createCookie('timerPaused', false, 30);
-            // }
-            // if (data.val().invertedColors != undefined) {
-            //     createCookie('invertedColors', data.val().invertedColors, 30);
-            // } else {
-            //     createCookie('invertedColors', "", 30);
-            // }
-            // if (data.val().minutesLeft != undefined) {
-            //     createCookie('minutesLeft', data.val().minutesLeft, 30);
-            // } else {
-            //     createCookie('minutesLeft', 0, 30);
-            // }
-            // //console.log(data.val().time);
-            // if (data.val().time != undefined) {
-            //     createCookie('time', data.val().time, 30);
-            //     isCookieTimer = true;
-            // } else {
-            //     createCookie('time', null, 30);
-            // }
             if (isCookieTimer) {
                 var isTicking = cookiesTimer().then(
                     isWriteFB = true
@@ -239,8 +220,6 @@ $(function() {
             }
         }
     });
-    createCookie('config', JSON.stringify(config), 30);
-    createCookie('playConfig', JSON.stringify(playConfig), 30);
     //var refConfig = database.ref('cronopitch/' + idFirebase + '/config');
     //refConfig.set(config);
 
@@ -574,6 +553,7 @@ var blinkTimer = null;
 var isInvertedColors = 0;
 
 function invertColors() {
+    getTime();
     if (isInvertedColors == 0) {
         $("body").css("background-color", config.bgColorInverted);
         $("#displayTimer").css('color', config.fontColorInverted);
@@ -592,9 +572,10 @@ function invertColors() {
 }
 
 function pauseTimer() {
+    getTime();
     if (timer != null) {
-        var now = new Date().getTime();
-        console.log(countDownDate);
+        var now = (Date.now()) + dateDiffFb;
+        //console.log(countDownDate);
         distance = countDownDate - now;
         clearInterval(timer);
         timer = null;
@@ -616,11 +597,12 @@ var isResumed = false;
 var continuous = false;
 
 function resumeTimer() {
+    getTime();
     clearInterval(blinkTimer);
     if (!continuous) {
-        countDownDate = new Date().getTime() + distance;
+        countDownDate = (Date.now()) + dateDiffFb + distance;
     } else {
-        countDownDate = new Date().getTime() - distance;
+        countDownDate = (Date.now()) + dateDiffFb - distance;
     }
     isResumed = true;
     isPaused = false;
@@ -637,6 +619,7 @@ function cookiesTimer() {
     return new Promise((resolve, reject) => {
         //console.log(playConfig.time);
         if (isShowAdvanced) {
+            isShowAdvanced = false;
             $('#config').modal('toggle');
         }
         countDownDateCookie = playConfig.time;
@@ -645,16 +628,16 @@ function cookiesTimer() {
         //console.log("isPaused ", isPaused);
         if (isPaused) {
             var timerPausedTimer = playConfig.timerPausedTime;
-            console.log(timerPausedTimer);
-            countDownDate = new Date().getTime() + parseInt(timerPausedTimer);
+            //console.log(timerPausedTimer);
+            countDownDate = (Date.now()) + dateDiffFb + parseInt(timerPausedTimer);
             setTimer(countDownDate)
                 .then(
                     pauseTimer()
                 );
             return true;
         } else if (countDownDateCookie != null && countDownDateCookie != "") {
-            var now = new Date();
-            if (countDownDateCookie > now.getTime() || config.continuous) {
+            var now = (Date.now()) + dateDiffFb;
+            if (countDownDateCookie > now || config.continuous) {
                 countDownDate = countDownDateCookie;
                 setTimer(countDownDate);
             }
@@ -676,8 +659,8 @@ function prepareTimer(minutesLeft) {
             minutesLeft = $("#time").find(":selected").val();
         }
         //minutesLeft = 5/60;
-        countDownDate = new Date().getTime() + (60000 * minutesLeft + 1000);
-        //countDownDate = new Date().getTime() + (3000);
+        countDownDate = Date.now() + dateDiffFb + (60000 * minutesLeft + 1000);
+        //countDownDate = Date.now() + (3000);
         playConfig.minutesLeft = minutesLeft;
         playConfig.time = countDownDate;
         createCookie('playConfig', JSON.stringify(playConfig), 30);
@@ -686,6 +669,7 @@ function prepareTimer(minutesLeft) {
 }
 
 function resetTimer() {
+    getTime();
     clearInterval(timer);
     clearInterval(blinkTimer);
     timer = null;
@@ -706,7 +690,7 @@ function resetTimer() {
     countDownDate = null;
     hideFrontLayer();
 }
-var distance = 0;
+
 
 function setColorDefault() {
     $("body").css("background-color", config.bgColorDefault);
@@ -720,6 +704,7 @@ function setColorDefault() {
 
 function setTimer(countDownDate) {
     return new Promise((resolve, reject) => {
+        getTime();
         continuous = false;
         $("#displayTimer").css("fontSize", "35vw");
         setColorDefault();
@@ -756,7 +741,7 @@ function setTimer(countDownDate) {
 
 function showTimer() {
     $(window).scrollTop(0);
-    var now = new Date().getTime();
+    var now = Date.now() + dateDiffFb;
     distance = countDownDate - now;
     if (distance < 0 && config.continuous == true) {
         continuous = true;
@@ -778,6 +763,7 @@ function showTimer() {
     }
     if (!continuous) {
         $("#displayTimer").text(minutes + ":" + seconds);
+        //document.title = minutes + ":" + seconds;
         if (distance <= config.secondsAlert * 1000 + 900) {
             $("body").css("background-color", config.bgColorAlert);
             $("#displayTimer").css("color", config.fontColorAlert);
@@ -844,7 +830,15 @@ function readCookie(name) {
         if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
     }
     return null;
+}
 
+function getTime() {
+    database.ref("/.info/serverTimeOffset").on('value', function(offset) {
+        var offsetVal = offset.val() || 0;
+        var serverTime = Date.now() + offsetVal;
+        dateDiffFb = serverTime - (Date.now());
+        //console.log(serverTime, dateDiffFb, Date.now(), (Date.now()));
+    });
 }
 
 function eraseCookie(name) {
@@ -855,6 +849,7 @@ function eraseCookie(name) {
 
 function showFrontLayer() {
     //animateRotate(-20);
+    getTime();
     $("#frontlayer").text(config.msgEnd);
     $("#bg_mask").css({ visibility: "visible", opacity: 0.0 }).animate({ opacity: 1.0 }, 100);
     $("#frontlayer").css({ visibility: "visible", opacity: 0.0 }).animate({ opacity: 1.0 }, 100);
