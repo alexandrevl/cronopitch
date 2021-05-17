@@ -87,43 +87,7 @@ function getUrlVars() {
 }
 
 $(function() {
-    // if (window.innerWidth < window.innerHeight) {
-    //     $(window).scrollTop(0);
-    //     if (timer != null) {
-    //         $("#displayTimer").hide();
-    //         $("#controls").hide();
-    //         $("#turnScreen").show();
-    //     } else {
-    //         $("#welcomeCard").hide();
-    //         $("#turnScreen").show();
-    //     }
-    // }
-    // window.addEventListener('orientationchange', function(event) {
-    //     if (window.innerWidth < window.innerHeight) {
-    //         $(window).scrollTop(0);
-    //         if (timer != null) {
-    //             $("#displayTimer").hide();
-    //             $("#controls").hide();
-    //             $("#turnScreen").show();
-    //         } else {
-    //             $("#welcomeCard").hide();
-    //             $("#turnScreen").show();
-    //         }
-    //     } else {
-    //         if (timer != null) {
-    //             $("#displayTimer").show();
-    //             $("#controls").show();
-    //             $("#turnScreen").hide();
-    //         } else {
-    //             $("#welcomeCard").show();
-    //             $("#turnScreen").hide();
-    //         }
-    //     }
-    // }, false);
-    //readDeviceOrientation();
-    //window.onorientationchange = readDeviceOrientation;
-    ratio = window.innerWidth / window.innerHeight;
-    //console.log(ratio);
+    ratio = window.innerWidth / window.innerHeight;;
     if (ratio > 1.90) {
         $('#controls').attr('style', 'position:fixed; bottom:2%; left: 50%;transform: translate(-50%, 0) ; opacity: 0.1');
     } else {
@@ -174,7 +138,7 @@ $(function() {
             idFirebase = config.idFirebase;
         }
         //idClient = config.idClient;
-    }
+    } 
     if (idFirebaseRemote != null && idFirebaseRemote != "" && idFirebaseRemote != 0 && idFirebaseRemote != undefined) {
         config.idFirebase = idFirebaseRemote;
         configDefault.idFirebase = idFirebaseRemote;
@@ -189,6 +153,8 @@ $(function() {
         createCookie('config', JSON.stringify(config), 30);
         createCookie('playConfig', JSON.stringify(playConfig), 30);
     }
+    var noSleep = new NoSleep();
+
     var refFirebase = database.ref('cronopitch/' + idFirebase);
     refFirebase.on('value', (data) => {
         database.ref("/.info/serverTimeOffset").on('value', function(offset) {
@@ -412,6 +378,10 @@ $(function() {
     $("#resetTime").click(function() {
         resetTimer();
     });
+    document.addEventListener('play', function enableNoSleep() {
+        document.removeEventListener('play', enableNoSleep, false);
+        noSleep.enable();
+    }, false);
     $("#play").click(function() {
         resumeTimer();
     });
@@ -681,6 +651,7 @@ function resetTimer() {
     $("#invertColors").show();
     $("#controls").hide();
     $("#welcomeCard").show();
+    document.title = 'Cronopitch - A timer for your pitch';
     $("#displayTimer").text("");
     $("#displayTimer").fadeIn(1);
     $("#displayTimer").html('');
@@ -717,6 +688,7 @@ function setTimer(countDownDate) {
         this.countDownDate = countDownDate;
         if (!isResumed) {
             $("#displayTimer").text(minutesLeft + ":00");
+            document.title = 'Cronopitch - ' + minutes + ":" + seconds;
         } else {
             isResumed = false;
         }
@@ -764,6 +736,7 @@ function showTimer() {
     if (!continuous) {
         $("#displayTimer").text(minutes + ":" + seconds);
         //document.title = minutes + ":" + seconds;
+        document.title = 'Cronopitch - ' + minutes + ":" + seconds;
         if (distance <= config.secondsAlert * 1000 + 900) {
             $("body").css("background-color", config.bgColorAlert);
             $("#displayTimer").css("color", config.fontColorAlert);
@@ -780,11 +753,13 @@ function showTimer() {
             $("#displayTimer").css("fontSize", "35vw");
         }
         $("#displayTimer").html('<i class="fa fa-plus" aria-hidden="true" style="font-size: 8vw; vertical-align: middle;"></i>' + minutes + ":" + seconds);
+         document.title = 'Cronopitch - ' + minutes + ":" + seconds;
     }
     if (distance <= 0) {
         if (config.continuous == false) {
             clearInterval(timer);
             $("#displayTimer").text("0:00");
+            document.title = 'Cronopitch - A timer for your pitch';
             countDownDate = null;
             timer = null;
             if (config.showMsgEnd) {
